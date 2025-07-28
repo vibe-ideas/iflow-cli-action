@@ -37,15 +37,15 @@ jobs:
           command: |
             Generate a beautiful HTML homepage for the iFlow CLI Action GitHub repository. 
             Include:
-            - Project title and description
-            - Key features and benefits
-            - Usage examples with code snippets
+            - Project title and description mentioning automatic --prompt and --yolo flags
+            - Key features and benefits highlighting streamlined non-interactive execution
+            - Usage examples with code snippets showing simple command syntax
             - Links to documentation and examples
             - Modern, responsive design with CSS styling
             - Use the favicon: https://img.alicdn.com/imgextra/i1/O1CN01nulwex1q7Eq1TVqUh_!!6000000005448-55-tps-32-32.svg
             
-            Generate complete HTML file with embedded CSS that showcases this GitHub Action.
-            Make it professional and visually appealing.
+            Generate complete HTML file with embedded CSS that showcases this GitHub Action with automatic --prompt and --yolo flag support.
+            Make it professional and visually appealing, emphasizing the streamlined execution model.
           api-key: ${{ secrets.IFLOW_API_KEY }}
           model: "Qwen3-Coder"
           timeout: 300
@@ -142,25 +142,25 @@ jobs:
                   <div class="header">
                       <img src="https://img.alicdn.com/imgextra/i1/O1CN01nulwex1q7Eq1TVqUh_!!6000000005448-55-tps-32-32.svg" alt="iFlow Logo" class="logo">
                       <h1>iFlow CLI Action</h1>
-                      <p class="subtitle">AI-Powered GitHub Action for Intelligent Development Workflows</p>
+                      <p class="subtitle">AI-Powered GitHub Action with Automatic --prompt and --yolo Flags</p>
                   </div>
 
                   <div class="features">
                       <div class="feature">
                           <h3>🚀 Easy Integration</h3>
-                          <p>Seamlessly integrate AI-powered development tools into your GitHub workflows with minimal configuration.</p>
+                          <p>Seamlessly integrate AI-powered development tools into your GitHub workflows with minimal configuration and automatic --prompt and --yolo flags.</p>
                       </div>
                       <div class="feature">
                           <h3>🎯 Smart Automation</h3>
-                          <p>Automate code reviews, documentation generation, and quality assessments using advanced AI models.</p>
+                          <p>Automate code reviews, documentation generation, and quality assessments using advanced AI models with streamlined non-interactive execution.</p>
                       </div>
                       <div class="feature">
                           <h3>⚡ High Performance</h3>
-                          <p>Built with Go 1.24.4 and pre-installed Node.js 22 for optimal performance and fast execution.</p>
+                          <p>Built with Go 1.24.4 and pre-installed Node.js 22 for optimal performance, fast execution, and automatic --prompt --yolo flag support.</p>
                       </div>
                       <div class="feature">
                           <h3>🔧 Flexible Configuration</h3>
-                          <p>Support for both simple parameter-based setup and advanced custom JSON configurations.</p>
+                          <p>Support for both simple parameter-based setup and advanced custom JSON configurations with automatic streamlined execution.</p>
                       </div>
                   </div>
 

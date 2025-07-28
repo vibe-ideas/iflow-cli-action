@@ -2,6 +2,8 @@
 
 This directory contains example GitHub Actions workflows demonstrating how to use the iFlow CLI Action.
 
+**Note:** All iFlow CLI commands are automatically executed with `--prompt` and `--yolo` flags for non-interactive, streamlined operation.
+
 ## Basic Examples
 
 ### Code Review on Pull Request

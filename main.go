@@ -86,8 +86,8 @@ func main() {
 		return
 	}
 
-	// Execute iFlow CLI command
-	info(fmt.Sprintf("Executing iFlow CLI command: %s", command))
+	// Execute iFlow CLI command with --prompt and --yolo flags
+	info(fmt.Sprintf("Executing iFlow CLI command with --prompt and --yolo: %s", command))
 	result, exitCode, err := executeIFlow(command, timeout)
 	if err != nil {
 		setFailed(fmt.Sprintf("Failed to execute iFlow CLI: %v", err))
@@ -194,15 +194,11 @@ func executeIFlow(command string, timeoutSeconds int) (string, int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeoutSeconds)*time.Second)
 	defer cancel()
 
-	// Prepare the command with --yolo flag by default
+	// Prepare the command with --prompt and --yolo flags by default
 	var cmd *exec.Cmd
-	if strings.Contains(command, "\n") || strings.Contains(command, ";") {
-		// Multi-line or complex command - use interactive mode
-		cmd = exec.CommandContext(ctx, "bash", "-c", fmt.Sprintf(`echo "%s" | iflow --yolo`, strings.ReplaceAll(command, "\"", "\\\"")))
-	} else {
-		// Simple command - add --yolo flag
-		cmd = exec.CommandContext(ctx, "iflow", "--yolo", command)
-	}
+	
+	// Use --prompt and --yolo flags for all commands
+	cmd = exec.CommandContext(ctx, "iflow", "--prompt", command, "--yolo")
 
 	output, err := cmd.CombinedOutput()
 	
