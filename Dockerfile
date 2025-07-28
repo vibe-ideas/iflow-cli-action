@@ -1,5 +1,5 @@
-# Use Node.js 20 as base for runtime with latest LTS Node.js pre-installed
-FROM node:20-slim AS runtime-base
+# Use Node.js 22 as base for runtime with latest Node.js pre-installed
+FROM node:22-slim AS runtime-base
 
 # Install runtime dependencies
 RUN apt-get update && \

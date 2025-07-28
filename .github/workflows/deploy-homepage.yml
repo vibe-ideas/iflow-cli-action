@@ -1,0 +1,229 @@
+name: Build and Deploy Homepage
+
+on:
+  # Run every day at 02:00 UTC
+  schedule:
+    - cron: '0 2 * * *'
+  # Allow manual trigger
+  workflow_dispatch:
+  # Also run on pushes to main branch
+  push:
+    branches: [ main ]
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Generate homepage content using iFlow CLI
+        uses: ./
+        with:
+          command: |
+            Generate a beautiful HTML homepage for the iFlow CLI Action GitHub repository. 
+            Include:
+            - Project title and description
+            - Key features and benefits
+            - Usage examples with code snippets
+            - Links to documentation and examples
+            - Modern, responsive design with CSS styling
+            - Use the favicon: https://img.alicdn.com/imgextra/i1/O1CN01nulwex1q7Eq1TVqUh_!!6000000005448-55-tps-32-32.svg
+            
+            Generate complete HTML file with embedded CSS that showcases this GitHub Action.
+            Make it professional and visually appealing.
+          api-key: ${{ secrets.IFLOW_API_KEY }}
+          model: "Qwen3-Coder"
+          timeout: 300
+
+      - name: Save generated content to index.html
+        run: |
+          echo "Creating homepage directory..."
+          mkdir -p _site
+          
+          # Check if iFlow generated content and save it
+          if [ -f "output.html" ]; then
+            cp output.html _site/index.html
+          else
+            # Fallback homepage if iFlow didn't generate a file
+            cat > _site/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>iFlow CLI Action</title>
+              <link rel="icon" type="image/svg+xml" href="https://img.alicdn.com/imgextra/i1/O1CN01nulwex1q7Eq1TVqUh_!!6000000005448-55-tps-32-32.svg">
+              <style>
+                  body {
+                      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                      line-height: 1.6;
+                      max-width: 1200px;
+                      margin: 0 auto;
+                      padding: 20px;
+                      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                      color: #333;
+                      min-height: 100vh;
+                  }
+                  .container {
+                      background: white;
+                      border-radius: 10px;
+                      padding: 40px;
+                      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                  }
+                  .header {
+                      text-align: center;
+                      margin-bottom: 40px;
+                  }
+                  .logo {
+                      width: 64px;
+                      height: 64px;
+                      margin-bottom: 20px;
+                  }
+                  h1 {
+                      color: #2c3e50;
+                      margin-bottom: 10px;
+                  }
+                  .subtitle {
+                      color: #7f8c8d;
+                      font-size: 1.2em;
+                      margin-bottom: 30px;
+                  }
+                  .features {
+                      display: grid;
+                      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                      gap: 30px;
+                      margin: 40px 0;
+                  }
+                  .feature {
+                      padding: 20px;
+                      border-left: 4px solid #3498db;
+                      background: #f8f9fa;
+                  }
+                  .code-block {
+                      background: #2c3e50;
+                      color: #ecf0f1;
+                      padding: 20px;
+                      border-radius: 5px;
+                      overflow-x: auto;
+                      margin: 20px 0;
+                  }
+                  .btn {
+                      display: inline-block;
+                      background: #3498db;
+                      color: white;
+                      padding: 12px 24px;
+                      text-decoration: none;
+                      border-radius: 5px;
+                      margin: 10px 5px;
+                      transition: background 0.3s;
+                  }
+                  .btn:hover {
+                      background: #2980b9;
+                  }
+              </style>
+          </head>
+          <body>
+              <div class="container">
+                  <div class="header">
+                      <img src="https://img.alicdn.com/imgextra/i1/O1CN01nulwex1q7Eq1TVqUh_!!6000000005448-55-tps-32-32.svg" alt="iFlow Logo" class="logo">
+                      <h1>iFlow CLI Action</h1>
+                      <p class="subtitle">AI-Powered GitHub Action for Intelligent Development Workflows</p>
+                  </div>
+
+                  <div class="features">
+                      <div class="feature">
+                          <h3>🚀 Easy Integration</h3>
+                          <p>Seamlessly integrate AI-powered development tools into your GitHub workflows with minimal configuration.</p>
+                      </div>
+                      <div class="feature">
+                          <h3>🎯 Smart Automation</h3>
+                          <p>Automate code reviews, documentation generation, and quality assessments using advanced AI models.</p>
+                      </div>
+                      <div class="feature">
+                          <h3>⚡ High Performance</h3>
+                          <p>Built with Go 1.24.4 and pre-installed Node.js 22 for optimal performance and fast execution.</p>
+                      </div>
+                      <div class="feature">
+                          <h3>🔧 Flexible Configuration</h3>
+                          <p>Support for both simple parameter-based setup and advanced custom JSON configurations.</p>
+                      </div>
+                  </div>
+
+                  <h2>Quick Start</h2>
+                  <p>Add this action to your workflow:</p>
+                  <div class="code-block">
+                      <pre>
+          - name: AI Code Review
+            uses: vibe-ideas/iflow-cli-action@v1
+            with:
+              command: "Review this pull request for code quality and suggest improvements"
+              api-key: ${{ secrets.IFLOW_API_KEY }}
+              model: "Qwen3-Coder"
+                      </pre>
+                  </div>
+
+                  <h2>Advanced Usage</h2>
+                  <div class="code-block">
+                      <pre>
+          - name: Custom Configuration
+            uses: vibe-ideas/iflow-cli-action@v1
+            with:
+              command: "Generate comprehensive documentation for this project"
+              api-key: ${{ secrets.IFLOW_API_KEY }}
+              settings-json: |
+                {
+                  "theme": "Dark",
+                  "selectedAuthType": "iflow",
+                  "baseUrl": "https://apis.iflow.cn/v1",
+                  "modelName": "Qwen3-Coder"
+                }
+                      </pre>
+                  </div>
+
+                  <div style="text-align: center; margin-top: 40px;">
+                      <a href="https://github.com/vibe-ideas/iflow-cli-action" class="btn">View on GitHub</a>
+                      <a href="https://github.com/vibe-ideas/iflow-cli-action/blob/main/README.md" class="btn">Documentation</a>
+                      <a href="https://github.com/vibe-ideas/iflow-cli-action/tree/main/examples" class="btn">Examples</a>
+                  </div>
+
+                  <footer style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; color: #666;">
+                      <p>Built with ❤️ by vibe-ideas • Last updated: $(date)</p>
+                  </footer>
+              </div>
+          </body>
+          </html>
+          EOF
+          fi
+          
+          echo "Homepage generated successfully!"
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./_site
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

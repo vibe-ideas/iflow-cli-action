@@ -1,10 +1,10 @@
 # 🤖 iFlow CLI GitHub Action
 
-A GitHub Action that enables you to run [iFlow CLI](https://github.com/iflow-ai/iflow-cli) commands within your GitHub workflows. This action automatically handles the installation of Node.js and iFlow CLI, and executes your specified commands.
+A GitHub Action that enables you to run [iFlow CLI](https://github.com/iflow-ai/iflow-cli) commands within your GitHub workflows. This Docker-based action comes with Node.js 22 and npm pre-installed for optimal performance, and executes your specified commands using the iFlow CLI.
 
 ## Features
 
-- ✅ Automatic installation of Node.js and iFlow CLI dependencies
+- ✅ Docker-based action with pre-installed Node.js 22 and npm
 - ✅ Configurable authentication with iFlow API
 - ✅ Support for custom models and API endpoints
 - ✅ Flexible command execution with timeout control
@@ -112,7 +112,6 @@ jobs:
 | `model` | Model name to use | ❌ No | `Qwen3-Coder` |
 | `working-directory` | Working directory to run iFlow CLI from | ❌ No | `.` |
 | `timeout` | Timeout for iFlow CLI execution in seconds | ❌ No | `300` |
-| `node-version` | Node.js version to install | ❌ No | `20` |
 
 ## Outputs
 
@@ -231,11 +230,6 @@ timeout: "900"  # 15 minutes
 ```
 
 **API authentication failed:** Verify your API key is correctly set in repository secrets
-
-**Node.js installation issues:** Specify a different Node.js version
-```yaml
-node-version: "18"
-```
 
 **Working directory not found:** Ensure the path exists and checkout action is used
 ```yaml
