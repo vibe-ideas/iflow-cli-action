@@ -1,5 +1,6 @@
 # Build artifacts
 iflow-action
+main
 *.exe
 *.exe~
 *.dll
