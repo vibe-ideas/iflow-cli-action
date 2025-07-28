@@ -1,0 +1,44 @@
+name: 'iFlow CLI Action'
+description: 'Execute iFlow CLI commands in GitHub Actions workflows'
+author: 'vibe-ideas'
+branding:
+  icon: 'terminal'
+  color: 'blue'
+
+inputs:
+  command:
+    description: 'The iFlow CLI command to execute'
+    required: true
+  api-key:
+    description: 'iFlow API key for authentication'
+    required: false
+  base-url:
+    description: 'Custom base URL for iFlow API'
+    required: false
+    default: 'https://apis.iflow.cn/v1'
+  model:
+    description: 'Model name to use'
+    required: false
+    default: 'Qwen3-Coder'
+  working-directory:
+    description: 'Working directory to run iFlow CLI from'
+    required: false
+    default: '.'
+  timeout:
+    description: 'Timeout for iFlow CLI execution in seconds'
+    required: false
+    default: '300'
+  node-version:
+    description: 'Node.js version to install'
+    required: false
+    default: '20'
+
+outputs:
+  result:
+    description: 'Output from iFlow CLI execution'
+  exit-code:
+    description: 'Exit code from iFlow CLI execution'
+
+runs:
+  using: 'go'
+  main: 'main.go'

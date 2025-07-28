@@ -1,3 +1,231 @@
-# 🤖 iFlow CLI
+# 🤖 iFlow CLI GitHub Action
 
-Automate software development tasks within your GitHub repositories with [iFlow CLI](https://github.com/iflow-ai/iflow-cli).
+A GitHub Action that enables you to run [iFlow CLI](https://github.com/iflow-ai/iflow-cli) commands within your GitHub workflows. This action automatically handles the installation of Node.js and iFlow CLI, and executes your specified commands.
+
+## Features
+
+- ✅ Automatic installation of Node.js and iFlow CLI dependencies
+- ✅ Configurable authentication with iFlow API
+- ✅ Support for custom models and API endpoints
+- ✅ Flexible command execution with timeout control
+- ✅ Works in any working directory
+- ✅ Built with Go for fast, reliable execution
+
+## Usage
+
+### Basic Example
+
+```yaml
+name: iFlow CLI Example
+on: [push]
+
+jobs:
+  analyze-code:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Run iFlow CLI
+        uses: vibe-ideas/iflow-cli-action@v1
+        with:
+          command: "Analyze this codebase and suggest improvements"
+          api-key: ${{ secrets.IFLOW_API_KEY }}
+```
+
+### Advanced Example
+
+```yaml
+name: Advanced iFlow CLI Usage
+on: 
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  code-review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Initialize Project Analysis
+        uses: vibe-ideas/iflow-cli-action@v1
+        with:
+          command: "/init"
+          api-key: ${{ secrets.IFLOW_API_KEY }}
+          model: "Qwen3-Coder"
+          timeout: "600"
+          working-directory: "."
+      
+      - name: Generate Technical Documentation
+        uses: vibe-ideas/iflow-cli-action@v1
+        with:
+          command: "Generate technical documentation based on the codebase analysis"
+          api-key: ${{ secrets.IFLOW_API_KEY }}
+          base-url: "https://apis.iflow.cn/v1"
+          model: "DeepSeek-V3"
+        id: docs
+      
+      - name: Display Results
+        run: |
+          echo "Documentation generated:"
+          echo "${{ steps.docs.outputs.result }}"
+```
+
+### Multiple Commands Example
+
+```yaml
+name: Multi-step iFlow Analysis
+on: [workflow_dispatch]
+
+jobs:
+  comprehensive-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Project Overview
+        uses: vibe-ideas/iflow-cli-action@v1
+        with:
+          command: |
+            Analyze the project structure and provide:
+            1. Main architectural components
+            2. Key dependencies and their purposes
+            3. Potential security considerations
+          api-key: ${{ secrets.IFLOW_API_KEY }}
+          timeout: "900"
+      
+      - name: Code Quality Assessment
+        uses: vibe-ideas/iflow-cli-action@v1
+        with:
+          command: "Review the code for best practices, potential bugs, and performance improvements"
+          api-key: ${{ secrets.IFLOW_API_KEY }}
+          model: "Kimi-K2"
+```
+
+## Inputs
+
+| Input | Description | Required | Default |
+|-------|-------------|----------|---------|
+| `command` | The iFlow CLI command to execute | ✅ Yes | - |
+| `api-key` | iFlow API key for authentication | ❌ No | - |
+| `base-url` | Custom base URL for iFlow API | ❌ No | `https://apis.iflow.cn/v1` |
+| `model` | Model name to use | ❌ No | `Qwen3-Coder` |
+| `working-directory` | Working directory to run iFlow CLI from | ❌ No | `.` |
+| `timeout` | Timeout for iFlow CLI execution in seconds | ❌ No | `300` |
+| `node-version` | Node.js version to install | ❌ No | `20` |
+
+## Outputs
+
+| Output | Description |
+|--------|-------------|
+| `result` | Output from iFlow CLI execution |
+| `exit-code` | Exit code from iFlow CLI execution |
+
+## Authentication
+
+### Getting an iFlow API Key
+
+1. Register for an iFlow account at [iflow.cn](https://iflow.cn)
+2. Go to your profile settings or [click here](https://iflow.cn/?open=setting)
+3. Click "Reset" in the pop-up dialog to generate a new API key
+4. Add the API key to your GitHub repository secrets as `IFLOW_API_KEY`
+
+### Available Models
+
+- `Qwen3-Coder` (default) - Excellent for code analysis and generation
+- `Kimi-K2` - Good for general AI tasks and longer contexts
+- `DeepSeek-V3` - Advanced reasoning and problem-solving
+- Custom models supported via OpenAI-compatible APIs
+
+## Common Use Cases
+
+### Code Analysis and Review
+
+```yaml
+- name: Code Review
+  uses: vibe-ideas/iflow-cli-action@v1
+  with:
+    command: "Review this pull request for code quality, security issues, and best practices"
+    api-key: ${{ secrets.IFLOW_API_KEY }}
+```
+
+### Documentation Generation
+
+```yaml
+- name: Generate Documentation
+  uses: vibe-ideas/iflow-cli-action@v1
+  with:
+    command: "/init && Generate comprehensive API documentation"
+    api-key: ${{ secrets.IFLOW_API_KEY }}
+    timeout: "600"
+```
+
+### Automated Testing Suggestions
+
+```yaml
+- name: Test Strategy
+  uses: vibe-ideas/iflow-cli-action@v1
+  with:
+    command: "Analyze the codebase and suggest a comprehensive testing strategy with specific test cases"
+    api-key: ${{ secrets.IFLOW_API_KEY }}
+    model: "DeepSeek-V3"
+```
+
+### Architecture Analysis
+
+```yaml
+- name: Architecture Review
+  uses: vibe-ideas/iflow-cli-action@v1
+  with:
+    command: "Analyze the system architecture and suggest improvements for scalability and maintainability"
+    api-key: ${{ secrets.IFLOW_API_KEY }}
+    timeout: "900"
+```
+
+## Requirements
+
+- **Runner**: Linux-based GitHub Actions runners (ubuntu-latest recommended)
+- **Permissions**: Actions need internet access to download dependencies
+- **Resources**: Sufficient timeout for command execution (adjust based on complexity)
+
+## Troubleshooting
+
+### Common Issues
+
+**Command timeout:** Increase the `timeout` value for complex operations
+```yaml
+timeout: "900"  # 15 minutes
+```
+
+**API authentication failed:** Verify your API key is correctly set in repository secrets
+
+**Node.js installation issues:** Specify a different Node.js version
+```yaml
+node-version: "18"
+```
+
+**Working directory not found:** Ensure the path exists and checkout action is used
+```yaml
+- uses: actions/checkout@v4  # Required before using iFlow action
+```
+
+### Debug Mode
+
+Enable verbose logging by setting environment variables:
+```yaml
+env:
+  ACTIONS_STEP_DEBUG: true
+```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit issues and pull requests.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Related
+
+- [iFlow CLI](https://github.com/iflow-ai/iflow-cli) - The underlying CLI tool
+- [iFlow Platform](https://docs.iflow.cn/en/docs) - Official documentation
+- [GitHub Actions Documentation](https://docs.github.com/en/actions)
