@@ -33,180 +33,27 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
-      - name: Generate homepage content using iFlow CLI
+      - name: Create homepage directory
+        run: mkdir -p _site
+
+      - name: Generate homepage using iFlow CLI
         uses: ./
         with:
-          prompt: "${{ vars.PROMPT }}"
+          prompt: "生成一个美观的 HTML 主页文件，保存为 _site/index.html。主页应该介绍 iFlow CLI Action 这个 GitHub Action 项目，包含以下内容：项目简介、主要功能特性、使用示例、快速开始指南等。使用现代化的 CSS 样式，包含渐变背景、卡片布局、响应式设计。请直接创建文件，不要返回代码内容。"
           # api_key: ${{ secrets.IFLOW_API_KEY }}
           settings_json: ${{ secrets.IFLOW_SETTINGS_JSON }}
           model: "Qwen3-Coder"
           timeout: 300
-        id: generate-homepage
 
-      - name: Save generated content to index.html
-        env:
-          IFLOW_RESULT: ${{ steps.generate-homepage.outputs.result }}
+      - name: Verify homepage was generated
         run: |
-          echo "Creating homepage directory..."
-          mkdir -p _site
-          
-          # Get the result from the iFlow CLI action output
-          if [ -n "$IFLOW_RESULT" ]; then
-            echo "Using iFlow generated content..."
-            printf '%s\n' "$IFLOW_RESULT" > _site/index.html
+          if [ -f "_site/index.html" ]; then
+            echo "Homepage generated successfully!"
+            ls -la _site/
           else
-            # Fallback homepage if iFlow didn't generate a file
-            cat > _site/index.html << 'EOF'
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <title>iFlow CLI Action</title>
-              <link rel="icon" type="image/svg+xml" href="https://img.alicdn.com/imgextra/i1/O1CN01nulwex1q7Eq1TVqUh_!!6000000005448-55-tps-32-32.svg">
-              <style>
-                  body {
-                      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                      line-height: 1.6;
-                      max-width: 1200px;
-                      margin: 0 auto;
-                      padding: 20px;
-                      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                      color: #333;
-                      min-height: 100vh;
-                  }
-                  .container {
-                      background: white;
-                      border-radius: 10px;
-                      padding: 40px;
-                      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-                  }
-                  .header {
-                      text-align: center;
-                      margin-bottom: 40px;
-                  }
-                  .logo {
-                      width: 64px;
-                      height: 64px;
-                      margin-bottom: 20px;
-                  }
-                  h1 {
-                      color: #2c3e50;
-                      margin-bottom: 10px;
-                  }
-                  .subtitle {
-                      color: #7f8c8d;
-                      font-size: 1.2em;
-                      margin-bottom: 30px;
-                  }
-                  .features {
-                      display: grid;
-                      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-                      gap: 30px;
-                      margin: 40px 0;
-                  }
-                  .feature {
-                      padding: 20px;
-                      border-left: 4px solid #3498db;
-                      background: #f8f9fa;
-                  }
-                  .code-block {
-                      background: #2c3e50;
-                      color: #ecf0f1;
-                      padding: 20px;
-                      border-radius: 5px;
-                      overflow-x: auto;
-                      margin: 20px 0;
-                  }
-                  .btn {
-                      display: inline-block;
-                      background: #3498db;
-                      color: white;
-                      padding: 12px 24px;
-                      text-decoration: none;
-                      border-radius: 5px;
-                      margin: 10px 5px;
-                      transition: background 0.3s;
-                  }
-                  .btn:hover {
-                      background: #2980b9;
-                  }
-              </style>
-          </head>
-          <body>
-              <div class="container">
-                  <div class="header">
-                      <img src="https://img.alicdn.com/imgextra/i1/O1CN01nulwex1q7Eq1TVqUh_!!6000000005448-55-tps-32-32.svg" alt="iFlow Logo" class="logo">
-                      <h1>iFlow CLI Action</h1>
-                      <p class="subtitle">AI-Powered GitHub Action with Automatic --prompt and --yolo Flags</p>
-                  </div>
-
-                  <div class="features">
-                      <div class="feature">
-                          <h3>🚀 Easy Integration</h3>
-                          <p>Seamlessly integrate AI-powered development tools into your GitHub workflows with minimal configuration and automatic --prompt and --yolo flags.</p>
-                      </div>
-                      <div class="feature">
-                          <h3>🎯 Smart Automation</h3>
-                          <p>Automate code reviews, documentation generation, and quality assessments using advanced AI models with streamlined non-interactive execution.</p>
-                      </div>
-                      <div class="feature">
-                          <h3>⚡ High Performance</h3>
-                          <p>Built with Go 1.24.4 and pre-installed Node.js 22 for optimal performance, fast execution, and automatic --prompt --yolo flag support.</p>
-                      </div>
-                      <div class="feature">
-                          <h3>🔧 Flexible Configuration</h3>
-                          <p>Support for both simple parameter-based setup and advanced custom JSON configurations with automatic streamlined execution.</p>
-                      </div>
-                  </div>
-
-                  <h2>Quick Start</h2>
-                  <p>Add this action to your workflow:</p>
-                  <div class="code-block">
-                      <pre>
-          - name: AI Code Review
-            uses: vibe-ideas/iflow-cli-action@v1
-            with:
-              prompt: "Review this pull request for code quality and suggest improvements"
-              api_key: "secrets.IFLOW_API_KEY"
-              model: "Qwen3-Coder"
-                      </pre>
-                  </div>
-
-                  <h2>Advanced Usage</h2>
-                  <div class="code-block">
-                      <pre>
-          - name: Custom Configuration
-            uses: vibe-ideas/iflow-cli-action@v1
-            with:
-              prompt: "Generate comprehensive documentation for this project"
-              api_key: " secrets.IFLOW_API_KEY "
-              settings_json: |
-                {
-                  "theme": "Dark",
-                  "selectedAuthType": "iflow",
-                  "baseUrl": "https://apis.iflow.cn/v1",
-                  "modelName": "Qwen3-Coder"
-                }
-                      </pre>
-                  </div>
-
-                  <div style="text-align: center; margin-top: 40px;">
-                      <a href="https://github.com/vibe-ideas/iflow-cli-action" class="btn">View on GitHub</a>
-                      <a href="https://github.com/vibe-ideas/iflow-cli-action/blob/main/README.md" class="btn">Documentation</a>
-                      <a href="https://github.com/vibe-ideas/iflow-cli-action/tree/main/examples" class="btn">Examples</a>
-                  </div>
-
-                  <footer style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; color: #666;">
-                      <p>Built with ❤️ by vibe-ideas • Last updated: $(date)</p>
-                  </footer>
-              </div>
-          </body>
-          </html>
-          EOF
+            echo "Error: Homepage was not generated by iFlow"
+            exit 1
           fi
-          
-          echo "Homepage generated successfully!"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
