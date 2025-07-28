@@ -117,10 +117,21 @@ func setOutput(name, value string) {
 	// GitHub Actions outputs can be set using the GITHUB_OUTPUT file
 	if outputFile := os.Getenv("GITHUB_OUTPUT"); outputFile != "" {
 		f, err := os.OpenFile(outputFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-		if err == nil {
-			defer f.Close()
-			f.WriteString(fmt.Sprintf("%s=%s\n", name, value))
+		if err != nil {
+			fmt.Printf("::error::Failed to open output file: %v\n", err)
+			return
 		}
+		defer f.Close()
+
+		// Use proper GitHub Actions output format with multiline support
+		delimiter := fmt.Sprintf("EOF_%d", os.Getpid())
+		_, err = f.WriteString(fmt.Sprintf("%s<<%s\n%s\n%s\n", name, delimiter, value, delimiter))
+		if err != nil {
+			fmt.Printf("::error::Failed to write output: %v\n", err)
+		}
+	} else {
+		// Fallback to legacy format if GITHUB_OUTPUT is not available
+		fmt.Printf("::set-output name=%s::%s\n", name, value)
 	}
 }
 
