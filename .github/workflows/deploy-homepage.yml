@@ -24,6 +24,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      GITHUB_PAGES: true
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -42,14 +44,16 @@ jobs:
         id: generate-homepage
 
       - name: Save generated content to index.html
+        env:
+          IFLOW_RESULT: ${{ steps.generate-homepage.outputs.result }}
         run: |
           echo "Creating homepage directory..."
           mkdir -p _site
           
           # Get the result from the iFlow CLI action output
-          if [ -n "${{ steps.generate-homepage.outputs.result }}" ]; then
+          if [ -n "$IFLOW_RESULT" ]; then
             echo "Using iFlow generated content..."
-            echo '${{ steps.generate-homepage.outputs.result }}' > _site/index.html
+            printf '%s\n' "$IFLOW_RESULT" > _site/index.html
           else
             # Fallback homepage if iFlow didn't generate a file
             cat > _site/index.html << 'EOF'
@@ -164,7 +168,7 @@ jobs:
             uses: vibe-ideas/iflow-cli-action@v1
             with:
               prompt: "Review this pull request for code quality and suggest improvements"
-              api_key: ${{ secrets.IFLOW_API_KEY }}
+              api_key: "secrets.IFLOW_API_KEY"
               model: "Qwen3-Coder"
                       </pre>
                   </div>
@@ -176,7 +180,7 @@ jobs:
             uses: vibe-ideas/iflow-cli-action@v1
             with:
               prompt: "Generate comprehensive documentation for this project"
-              api_key: ${{ secrets.IFLOW_API_KEY }}
+              api_key: " secrets.IFLOW_API_KEY "
               settings_json: |
                 {
                   "theme": "Dark",
