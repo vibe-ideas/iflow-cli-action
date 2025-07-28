@@ -106,7 +106,8 @@ jobs:
 | Input | Description | Required | Default |
 |-------|-------------|----------|---------|
 | `command` | The iFlow CLI command to execute | ✅ Yes | - |
-| `api-key` | iFlow API key for authentication | ❌ No | - |
+| `api-key` | iFlow API key for authentication | ✅ Yes | - |
+| `settings-json` | Complete iFlow settings.json content (JSON string). If provided, this will override other configuration options. | ❌ No | - |
 | `base-url` | Custom base URL for iFlow API | ❌ No | `https://apis.iflow.cn/v1` |
 | `model` | Model name to use | ❌ No | `Qwen3-Coder` |
 | `working-directory` | Working directory to run iFlow CLI from | ❌ No | `.` |
@@ -135,6 +136,39 @@ jobs:
 - `Kimi-K2` - Good for general AI tasks and longer contexts
 - `DeepSeek-V3` - Advanced reasoning and problem-solving
 - Custom models supported via OpenAI-compatible APIs
+
+## Custom Configuration
+
+### Using Custom Settings
+
+For advanced users who need complete control over the iFlow configuration, you can provide a custom `settings.json` directly:
+
+```yaml
+- name: Custom iFlow Configuration
+  uses: vibe-ideas/iflow-cli-action@v1
+  with:
+    command: "Analyze this codebase with custom configuration"
+    api-key: ${{ secrets.IFLOW_API_KEY }}  # Still required for basic validation
+    settings-json: |
+      {
+        "theme": "Dark",
+        "selectedAuthType": "iflow",
+        "apiKey": "${{ secrets.IFLOW_API_KEY }}",
+        "baseUrl": "https://custom-api.example.com/v1",
+        "modelName": "custom-model",
+        "searchApiKey": "${{ secrets.SEARCH_API_KEY }}",
+        "customField": "customValue"
+      }
+```
+
+When `settings-json` is provided, it takes precedence over individual configuration inputs (`base-url`, `model`, etc.). This allows you to:
+
+- Use custom authentication types
+- Configure additional fields not available as inputs
+- Maintain complex configurations across multiple workflow runs
+- Support custom API endpoints and models
+
+**Note:** The `api-key` input is still required for validation, but the actual API key used will be the one specified in your `settings-json`.
 
 ## Common Use Cases
 

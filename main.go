@@ -26,6 +26,7 @@ func main() {
 	// Get inputs from environment variables (GitHub Actions convention)
 	command := strings.TrimSpace(getInput("command"))
 	apiKey := getInput("api-key")
+	settingsJSON := getInput("settings-json")
 	baseURL := getInput("base-url")
 	if baseURL == "" {
 		baseURL = "https://apis.iflow.cn/v1"
@@ -50,6 +51,11 @@ func main() {
 	// Validate required inputs
 	if command == "" {
 		setFailed("command input is required and cannot be empty")
+		return
+	}
+	
+	if apiKey == "" && settingsJSON == "" {
+		setFailed("api-key input is required and cannot be empty")
 		return
 	}
 
@@ -81,13 +87,11 @@ func main() {
 		return
 	}
 
-	// Configure iFlow settings if API key is provided
-	if apiKey != "" {
-		info("Configuring iFlow settings...")
-		if err := configureIFlow(apiKey, baseURL, model); err != nil {
-			setFailed(fmt.Sprintf("Failed to configure iFlow: %v", err))
-			return
-		}
+	// Configure iFlow settings
+	info("Configuring iFlow settings...")
+	if err := configureIFlow(apiKey, baseURL, model, settingsJSON); err != nil {
+		setFailed(fmt.Sprintf("Failed to configure iFlow: %v", err))
+		return
 	}
 
 	// Execute iFlow CLI command
@@ -195,7 +199,7 @@ func installNodeJS(version string) error {
 	return nil
 }
 
-func configureIFlow(apiKey, baseURL, model string) error {
+func configureIFlow(apiKey, baseURL, model, settingsJSON string) error {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		return fmt.Errorf("failed to get home directory: %w", err)
@@ -208,18 +212,40 @@ func configureIFlow(apiKey, baseURL, model string) error {
 
 	settingsFile := filepath.Join(iflowDir, "settings.json")
 	
-	settings := IFlowSettings{
-		Theme:           "Default",
-		SelectedAuthType: "iflow",
-		APIKey:          apiKey,
-		BaseURL:         baseURL,
-		ModelName:       model,
-		SearchAPIKey:    apiKey,
-	}
+	var settingsData []byte
+	
+	if settingsJSON != "" {
+		// Use provided settings JSON directly
+		info("Using provided settings.json content")
+		
+		// Validate that it's valid JSON
+		var testSettings map[string]interface{}
+		if err := json.Unmarshal([]byte(settingsJSON), &testSettings); err != nil {
+			return fmt.Errorf("invalid settings-json provided: %w", err)
+		}
+		
+		// Pretty format the JSON
+		var prettyJSON json.RawMessage = []byte(settingsJSON)
+		settingsData, err = json.MarshalIndent(prettyJSON, "", "  ")
+		if err != nil {
+			return fmt.Errorf("failed to format settings JSON: %w", err)
+		}
+	} else {
+		// Create settings from individual parameters
+		info("Creating settings from individual parameters")
+		settings := IFlowSettings{
+			Theme:           "Default",
+			SelectedAuthType: "iflow",
+			APIKey:          apiKey,
+			BaseURL:         baseURL,
+			ModelName:       model,
+			SearchAPIKey:    apiKey,
+		}
 
-	settingsData, err := json.MarshalIndent(settings, "", "  ")
-	if err != nil {
-		return fmt.Errorf("failed to marshal settings: %w", err)
+		settingsData, err = json.MarshalIndent(settings, "", "  ")
+		if err != nil {
+			return fmt.Errorf("failed to marshal settings: %w", err)
+		}
 	}
 
 	if err := os.WriteFile(settingsFile, settingsData, 0644); err != nil {
