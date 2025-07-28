@@ -11,7 +11,7 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Pre-install iFlow CLI directly from the tgz package
+# Pre-install iFlow CLI using the correct package URL from the official installation script
 RUN npm install -g https://cloud.iflow.cn/iflow-cli/iflow-iflow-cli-0.0.2.tgz
 
 # Use official Go 1.24.4 image for building
@@ -38,9 +38,9 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o iflow-action main
 # Final stage - copy Go binary to Node.js runtime
 FROM runtime-base
 
-# Create a non-root user
+# Create a non-root user with proper home directory
 RUN groupadd -g 1001 iflow && \
-    useradd -r -u 1001 -g iflow iflow
+    useradd -r -u 1001 -g iflow -m -d /home/iflow iflow
 
 # Set working directory
 WORKDIR /github/workspace
@@ -50,6 +50,10 @@ COPY --from=builder /app/iflow-action /usr/local/bin/iflow-action
 
 # Make sure binary is executable
 RUN chmod +x /usr/local/bin/iflow-action
+
+# Create .iflow directory for the non-root user and set permissions
+RUN mkdir -p /home/iflow/.iflow && \
+    chown -R iflow:iflow /home/iflow/.iflow
 
 # Switch to non-root user
 USER iflow
