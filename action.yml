@@ -31,10 +31,6 @@ inputs:
     description: 'Timeout for iFlow CLI execution in seconds'
     required: false
     default: '300'
-  node-version:
-    description: 'Node.js version to install'
-    required: false
-    default: '20'
 
 outputs:
   result:
@@ -43,5 +39,5 @@ outputs:
     description: 'Exit code from iFlow CLI execution'
 
 runs:
-  using: 'go'
-  main: 'main.go'
+  using: 'docker'
+  image: 'Dockerfile'

@@ -43,10 +43,6 @@ func main() {
 	if timeoutStr == "" {
 		timeoutStr = "300"
 	}
-	nodeVersion := getInput("node-version")
-	if nodeVersion == "" {
-		nodeVersion = "20"
-	}
 
 	// Validate required inputs
 	if command == "" {
@@ -80,10 +76,10 @@ func main() {
 		}
 	}
 
-	// Install dependencies
-	info("Installing Node.js and iFlow CLI...")
-	if err := installDependencies(nodeVersion); err != nil {
-		setFailed(fmt.Sprintf("Failed to install dependencies: %v", err))
+	// Install dependencies (iFlow CLI only, Node.js is pre-installed in Docker)
+	info("Installing iFlow CLI...")
+	if err := installIFlowCLI(); err != nil {
+		setFailed(fmt.Sprintf("Failed to install iFlow CLI: %v", err))
 		return
 	}
 
@@ -141,27 +137,16 @@ func setFailed(message string) {
 	os.Exit(1)
 }
 
-func installDependencies(nodeVersion string) error {
-	// Check if Node.js is already installed
-	if cmd := exec.Command("node", "--version"); cmd.Run() == nil {
-		info("Node.js is already installed")
-	} else {
-		info(fmt.Sprintf("Installing Node.js %s...", nodeVersion))
-		if err := installNodeJS(nodeVersion); err != nil {
-			return fmt.Errorf("failed to install Node.js: %w", err)
-		}
-	}
-
+func installIFlowCLI() error {
 	// Check if iFlow CLI is already installed
 	if cmd := exec.Command("iflow", "--version"); cmd.Run() == nil {
 		info("iFlow CLI is already installed")
 		return nil
 	}
 
-	// Install iFlow CLI
-	info("Installing iFlow CLI...")
-	cmd := exec.Command("bash", "-c", "curl -fsSL https://cloud.iflow.cn/iflow-cli/install.sh | bash")
-	cmd.Env = append(os.Environ(), "NVM_DIR="+filepath.Join(os.Getenv("HOME"), ".nvm"))
+	// Install iFlow CLI using npm (Node.js is pre-installed)
+	info("Installing iFlow CLI via npm...")
+	cmd := exec.Command("npm", "install", "-g", "@iflow/cli")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("failed to install iFlow CLI: %w\nOutput: %s", err, output)
@@ -171,33 +156,6 @@ func installDependencies(nodeVersion string) error {
 	return nil
 }
 
-func installNodeJS(version string) error {
-	// Install Node.js using nvm
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return fmt.Errorf("failed to get home directory: %w", err)
-	}
-
-	nvmDir := filepath.Join(homeDir, ".nvm")
-	
-	// Download and install nvm
-	cmd := exec.Command("bash", "-c", fmt.Sprintf(`
-		export NVM_DIR="%s"
-		curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
-		source "$NVM_DIR/nvm.sh"
-		nvm install %s
-		nvm use %s
-		nvm alias default %s
-	`, nvmDir, version, version, version))
-	
-	cmd.Env = append(os.Environ(), "NVM_DIR="+nvmDir)
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return fmt.Errorf("failed to install Node.js: %w\nOutput: %s", err, output)
-	}
-
-	return nil
-}
 
 func configureIFlow(apiKey, baseURL, model, settingsJSON string) error {
 	homeDir, err := os.UserHomeDir()
@@ -260,51 +218,15 @@ func executeIFlow(command string, timeoutSeconds int) (string, int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeoutSeconds)*time.Second)
 	defer cancel()
 
-	// Setup environment for Node.js and npm
-	homeDir, _ := os.UserHomeDir()
-	nvmDir := filepath.Join(homeDir, ".nvm")
-	npmGlobalDir := filepath.Join(homeDir, ".npm-global")
-	
-	// Build PATH with Node.js locations
-	currentPath := os.Getenv("PATH")
-	nodePaths := []string{
-		filepath.Join(nvmDir, "versions", "node"),
-		filepath.Join(npmGlobalDir, "bin"),
-		filepath.Join(homeDir, ".local", "bin"),
-	}
-	
-	for _, path := range nodePaths {
-		if strings.Contains(currentPath, path) {
-			continue
-		}
-		currentPath = path + ":" + currentPath
-	}
-
 	// Prepare the command
 	var cmd *exec.Cmd
 	if strings.Contains(command, "\n") || strings.Contains(command, ";") {
 		// Multi-line or complex command - use interactive mode
-		cmd = exec.CommandContext(ctx, "bash", "-c", fmt.Sprintf(`
-			source ~/.nvm/nvm.sh 2>/dev/null || true
-			source ~/.bashrc 2>/dev/null || true
-			export PATH="%s"
-			echo "%s" | iflow
-		`, currentPath, strings.ReplaceAll(command, "\"", "\\\"")))
+		cmd = exec.CommandContext(ctx, "bash", "-c", fmt.Sprintf(`echo "%s" | iflow`, strings.ReplaceAll(command, "\"", "\\\"")))
 	} else {
 		// Simple command
-		cmd = exec.CommandContext(ctx, "bash", "-c", fmt.Sprintf(`
-			source ~/.nvm/nvm.sh 2>/dev/null || true
-			source ~/.bashrc 2>/dev/null || true
-			export PATH="%s"
-			iflow "%s"
-		`, currentPath, command))
+		cmd = exec.CommandContext(ctx, "iflow", command)
 	}
-
-	cmd.Env = append(os.Environ(),
-		"PATH="+currentPath,
-		"NVM_DIR="+nvmDir,
-		"HOME="+homeDir,
-	)
 
 	output, err := cmd.CombinedOutput()
 	

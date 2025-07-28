@@ -1,3 +1,3 @@
 module github.com/vibe-ideas/iflow-cli-action
 
-go 1.21
+go 1.24.4
