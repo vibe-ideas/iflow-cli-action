@@ -11,8 +11,8 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Pre-install iFlow CLI using the official installation script
-RUN bash -c "$(curl -fsSL https://cloud.iflow.cn/iflow-cli/install.sh)"
+# Pre-install iFlow CLI directly from the tgz package
+RUN npm install -g https://cloud.iflow.cn/iflow-cli/iflow-iflow-cli-0.0.2.tgz
 
 # Use official Go 1.24.4 image for building
 FROM golang:1.24.4-bullseye AS builder
