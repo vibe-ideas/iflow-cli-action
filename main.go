@@ -76,12 +76,8 @@ func main() {
 		}
 	}
 
-	// Install dependencies (iFlow CLI only, Node.js is pre-installed in Docker)
-	info("Installing iFlow CLI...")
-	if err := installIFlowCLI(); err != nil {
-		setFailed(fmt.Sprintf("Failed to install iFlow CLI: %v", err))
-		return
-	}
+	// iFlow CLI is pre-installed in Docker image
+	info("iFlow CLI is pre-installed and ready to use")
 
 	// Configure iFlow settings
 	info("Configuring iFlow settings...")
@@ -136,26 +132,6 @@ func setFailed(message string) {
 	fmt.Printf("::error::%s\n", message)
 	os.Exit(1)
 }
-
-func installIFlowCLI() error {
-	// Check if iFlow CLI is already installed
-	if cmd := exec.Command("iflow", "--version"); cmd.Run() == nil {
-		info("iFlow CLI is already installed")
-		return nil
-	}
-
-	// Install iFlow CLI using npm (Node.js is pre-installed)
-	info("Installing iFlow CLI via npm...")
-	cmd := exec.Command("npm", "install", "-g", "@iflow/cli")
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return fmt.Errorf("failed to install iFlow CLI: %w\nOutput: %s", err, output)
-	}
-
-	info("iFlow CLI installed successfully")
-	return nil
-}
-
 
 func configureIFlow(apiKey, baseURL, model, settingsJSON string) error {
 	homeDir, err := os.UserHomeDir()
@@ -218,14 +194,14 @@ func executeIFlow(command string, timeoutSeconds int) (string, int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeoutSeconds)*time.Second)
 	defer cancel()
 
-	// Prepare the command
+	// Prepare the command with --yolo flag by default
 	var cmd *exec.Cmd
 	if strings.Contains(command, "\n") || strings.Contains(command, ";") {
 		// Multi-line or complex command - use interactive mode
-		cmd = exec.CommandContext(ctx, "bash", "-c", fmt.Sprintf(`echo "%s" | iflow`, strings.ReplaceAll(command, "\"", "\\\"")))
+		cmd = exec.CommandContext(ctx, "bash", "-c", fmt.Sprintf(`echo "%s" | iflow --yolo`, strings.ReplaceAll(command, "\"", "\\\"")))
 	} else {
-		// Simple command
-		cmd = exec.CommandContext(ctx, "iflow", command)
+		// Simple command - add --yolo flag
+		cmd = exec.CommandContext(ctx, "iflow", "--yolo", command)
 	}
 
 	output, err := cmd.CombinedOutput()
