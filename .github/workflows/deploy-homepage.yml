@@ -39,7 +39,7 @@ jobs:
       - name: Generate homepage using iFlow CLI
         uses: ./
         with:
-          prompt: "生成一个美观的 HTML 主页文件，保存为 _site/index.html。主页应该介绍 iFlow CLI Action 这个 GitHub Action 项目，包含以下内容：项目简介、主要功能特性、使用示例、快速开始指南等。使用现代化的 CSS 样式，包含渐变背景、卡片布局、响应式设计。请直接创建文件，不要返回代码内容。"
+          prompt: "请阅读当前仓库的 README.md 文件内容，将其转换为一个精美的 HTML 主页文件并保存为 _site/index.html。要求：1. 保持 README 中的所有重要信息和结构；2. 使用现代化的 CSS 样式设计，包含渐变背景、卡片布局、代码高亮、响应式设计；3. 添加 GitHub 项目的 logo 和图标；4. 美化代码示例的展示效果；5. 添加导航和目录结构；6. 使用合适的颜色主题和字体。请直接创建 HTML 文件，不要返回代码内容。参考项目地址：https://github.com/vibe-ideas/iflow-cli-action"
           # api_key: ${{ secrets.IFLOW_API_KEY }}
           settings_json: ${{ secrets.IFLOW_SETTINGS_JSON }}
           model: "Qwen3-Coder"
