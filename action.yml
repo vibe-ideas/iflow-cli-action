@@ -1,0 +1,9 @@
+name: 'iFlow CLI Action'
+description: 'A GitHub Action to run the iFlow CLI'
+inputs:
+  command:
+    description: 'The command to pass to the iFlow CLI'
+    required: true
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
