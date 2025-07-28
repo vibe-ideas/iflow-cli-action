@@ -1,0 +1,39 @@
+name: Generate Documentation
+on:
+  push:
+    branches: [main]
+    paths: ['**.go', '**.js', '**.py', '**.java', '**.ts']
+
+jobs:
+  generate-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Initialize project analysis
+        uses: vibe-ideas/iflow-cli-action@v1
+        with:
+          prompt: "/init"
+          api-key: ${{ secrets.IFLOW_API_KEY }}
+          timeout: "300"
+      
+      - name: Generate documentation
+        uses: vibe-ideas/iflow-cli-action@v1
+        with:
+          prompt: "Generate comprehensive technical documentation including API docs, architecture overview, and usage examples based on the codebase analysis."
+          api-key: ${{ secrets.IFLOW_API_KEY }}
+          model: "Qwen3-Coder"
+          timeout: "600"
+        id: docs
+      
+      - name: Create documentation file
+        run: |
+          mkdir -p docs
+          echo "${{ steps.docs.outputs.result }}" > docs/TECHNICAL_DOCS.md
+      
+      - name: Commit documentation
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "docs: auto-generate technical documentation"
+          file_pattern: docs/TECHNICAL_DOCS.md

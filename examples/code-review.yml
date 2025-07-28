@@ -1,0 +1,31 @@
+name: Code Review with iFlow CLI
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  iflow-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Review code with iFlow CLI
+        uses: vibe-ideas/iflow-cli-action@v1
+        with:
+          prompt: "Review this pull request for code quality, security issues, and best practices. Provide specific suggestions for improvement."
+          api-key: ${{ secrets.IFLOW_API_KEY }}
+          model: "Qwen3-Coder"
+          timeout: "600"
+        id: review
+      
+      - name: Comment on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '## 🤖 iFlow CLI Code Review\n\n' + '${{ steps.review.outputs.result }}'
+            })
