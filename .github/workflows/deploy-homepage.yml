@@ -46,8 +46,8 @@ jobs:
             
             Generate complete HTML file with embedded CSS that showcases this GitHub Action with automatic --prompt and --yolo flag support.
             Make it professional and visually appealing, emphasizing the streamlined execution model.
-          # api-key: ${{ secrets.IFLOW_API_KEY }}
-          settings-json: ${{ secrets.IFLOW_SETTINGS_JSON }}
+          # api_key: ${{ secrets.IFLOW_API_KEY }}
+          settings_json: ${{ secrets.IFLOW_SETTINGS_JSON }}
           model: "Qwen3-Coder"
           timeout: 300
 
@@ -173,7 +173,7 @@ jobs:
             uses: vibe-ideas/iflow-cli-action@v1
             with:
               prompt: "Review this pull request for code quality and suggest improvements"
-              api-key: ${{ secrets.IFLOW_API_KEY }}
+              api_key: ${{ secrets.IFLOW_API_KEY }}
               model: "Qwen3-Coder"
                       </pre>
                   </div>
@@ -185,8 +185,8 @@ jobs:
             uses: vibe-ideas/iflow-cli-action@v1
             with:
               prompt: "Generate comprehensive documentation for this project"
-              api-key: ${{ secrets.IFLOW_API_KEY }}
-              settings-json: |
+              api_key: ${{ secrets.IFLOW_API_KEY }}
+              settings_json: |
                 {
                   "theme": "Dark",
                   "selectedAuthType": "iflow",

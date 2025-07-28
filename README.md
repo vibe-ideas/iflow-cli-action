@@ -29,7 +29,7 @@ jobs:
         uses: vibe-ideas/iflow-cli-action@v1
         with:
           prompt: "Analyze this codebase and suggest improvements"
-          api-key: ${{ secrets.IFLOW_API_KEY }}
+          api_key: ${{ secrets.IFLOW_API_KEY }}
 ```
 
 ### Advanced Example
@@ -50,17 +50,17 @@ jobs:
         uses: vibe-ideas/iflow-cli-action@v1
         with:
           prompt: "/init"
-          api-key: ${{ secrets.IFLOW_API_KEY }}
+          api_key: ${{ secrets.IFLOW_API_KEY }}
           model: "Qwen3-Coder"
           timeout: "600"
-          working-directory: "."
+          working_directory: "."
       
       - name: Generate Technical Documentation
         uses: vibe-ideas/iflow-cli-action@v1
         with:
           prompt: "Generate technical documentation based on the codebase analysis"
-          api-key: ${{ secrets.IFLOW_API_KEY }}
-          base-url: "https://apis.iflow.cn/v1"
+          api_key: ${{ secrets.IFLOW_API_KEY }}
+          base_url: "https://apis.iflow.cn/v1"
           model: "DeepSeek-V3"
         id: docs
       
@@ -90,14 +90,14 @@ jobs:
             1. Main architectural components
             2. Key dependencies and their purposes
             3. Potential security considerations
-          api-key: ${{ secrets.IFLOW_API_KEY }}
+          api_key: ${{ secrets.IFLOW_API_KEY }}
           timeout: "900"
       
       - name: Code Quality Assessment
         uses: vibe-ideas/iflow-cli-action@v1
         with:
           prompt: "Review the code for best practices, potential bugs, and performance improvements"
-          api-key: ${{ secrets.IFLOW_API_KEY }}
+          api_key: ${{ secrets.IFLOW_API_KEY }}
           model: "Kimi-K2"
 ```
 
@@ -106,11 +106,11 @@ jobs:
 | Input | Description | Required | Default |
 |-------|-------------|----------|---------|
 | `prompt` | The prompt to execute with iFlow CLI | ✅ Yes | - |
-| `api-key` | iFlow API key for authentication | ✅ Yes | - |
-| `settings-json` | Complete iFlow settings.json content (JSON string). If provided, this will override other configuration options. | ❌ No | - |
-| `base-url` | Custom base URL for iFlow API | ❌ No | `https://apis.iflow.cn/v1` |
+| `api_key` | iFlow API key for authentication | ✅ Yes | - |
+| `settings_json` | Complete iFlow settings.json content (JSON string). If provided, this will override other configuration options. | ❌ No | - |
+| `base_url` | Custom base URL for iFlow API | ❌ No | `https://apis.iflow.cn/v1` |
 | `model` | Model name to use | ❌ No | `Qwen3-Coder` |
-| `working-directory` | Working directory to run iFlow CLI from | ❌ No | `.` |
+| `working_directory` | Working directory to run iFlow CLI from | ❌ No | `.` |
 | `timeout` | Timeout for iFlow CLI execution in seconds | ❌ No | `300` |
 
 ## Outputs
@@ -118,7 +118,7 @@ jobs:
 | Output | Description |
 |--------|-------------|
 | `result` | Output from iFlow CLI execution |
-| `exit-code` | Exit code from iFlow CLI execution |
+| `exit_code` | Exit code from iFlow CLI execution |
 
 ## Authentication
 
@@ -147,8 +147,8 @@ For advanced users who need complete control over the iFlow configuration, you c
   uses: vibe-ideas/iflow-cli-action@v1
   with:
     prompt: "Analyze this codebase with custom configuration"
-    api-key: ${{ secrets.IFLOW_API_KEY }}  # Still required for basic validation
-    settings-json: |
+    api_key: ${{ secrets.IFLOW_API_KEY }}  # Still required for basic validation
+    settings_json: |
       {
         "theme": "Dark",
         "selectedAuthType": "iflow",
@@ -160,14 +160,14 @@ For advanced users who need complete control over the iFlow configuration, you c
       }
 ```
 
-When `settings-json` is provided, it takes precedence over individual configuration inputs (`base-url`, `model`, etc.). This allows you to:
+When `settings_json` is provided, it takes precedence over individual configuration inputs (`base_url`, `model`, etc.). This allows you to:
 
 - Use custom authentication types
 - Configure additional fields not available as inputs
 - Maintain complex configurations across multiple workflow runs
 - Support custom API endpoints and models
 
-**Note:** The `api-key` input is still required for validation, but the actual API key used will be the one specified in your `settings-json`.
+**Note:** The `api_key` input is still required for validation, but the actual API key used will be the one specified in your `settings_json`.
 
 ## Common Use Cases
 
@@ -178,7 +178,7 @@ When `settings-json` is provided, it takes precedence over individual configurat
   uses: vibe-ideas/iflow-cli-action@v1
   with:
     prompt: "Review this pull request for code quality, security issues, and best practices"
-    api-key: ${{ secrets.IFLOW_API_KEY }}
+    api_key: ${{ secrets.IFLOW_API_KEY }}
 ```
 
 ### Documentation Generation
@@ -188,7 +188,7 @@ When `settings-json` is provided, it takes precedence over individual configurat
   uses: vibe-ideas/iflow-cli-action@v1
   with:
     prompt: "/init && Generate comprehensive API documentation"
-    api-key: ${{ secrets.IFLOW_API_KEY }}
+    api_key: ${{ secrets.IFLOW_API_KEY }}
     timeout: "600"
 ```
 
@@ -199,7 +199,7 @@ When `settings-json` is provided, it takes precedence over individual configurat
   uses: vibe-ideas/iflow-cli-action@v1
   with:
     prompt: "Analyze the codebase and suggest a comprehensive testing strategy with specific test cases"
-    api-key: ${{ secrets.IFLOW_API_KEY }}
+    api_key: ${{ secrets.IFLOW_API_KEY }}
     model: "DeepSeek-V3"
 ```
 
@@ -210,7 +210,7 @@ When `settings-json` is provided, it takes precedence over individual configurat
   uses: vibe-ideas/iflow-cli-action@v1
   with:
     prompt: "Analyze the system architecture and suggest improvements for scalability and maintainability"
-    api-key: ${{ secrets.IFLOW_API_KEY }}
+    api_key: ${{ secrets.IFLOW_API_KEY }}
     timeout: "900"
 ```
 

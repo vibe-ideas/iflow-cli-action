@@ -14,20 +14,20 @@ import (
 
 // IFlowSettings represents the iFlow configuration
 type IFlowSettings struct {
-	Theme           string `json:"theme"`
+	Theme            string `json:"theme"`
 	SelectedAuthType string `json:"selectedAuthType"`
-	APIKey          string `json:"apiKey"`
-	BaseURL         string `json:"baseUrl"`
-	ModelName       string `json:"modelName"`
-	SearchAPIKey    string `json:"searchApiKey"`
+	APIKey           string `json:"apiKey"`
+	BaseURL          string `json:"baseUrl"`
+	ModelName        string `json:"modelName"`
+	SearchAPIKey     string `json:"searchApiKey"`
 }
 
 func main() {
 	// Get inputs from environment variables (GitHub Actions convention)
 	prompt := strings.TrimSpace(getInput("prompt"))
-	apiKey := getInput("api-key")
-	settingsJSON := getInput("settings-json")
-	baseURL := getInput("base-url")
+	apiKey := getInput("api_key")
+	settingsJSON := getInput("settings_json")
+	baseURL := getInput("base_url")
 	if baseURL == "" {
 		baseURL = "https://apis.iflow.cn/v1"
 	}
@@ -35,7 +35,7 @@ func main() {
 	if model == "" {
 		model = "Qwen3-Coder"
 	}
-	workingDir := getInput("working-directory")
+	workingDir := getInput("working_directory")
 	if workingDir == "" {
 		workingDir = "."
 	}
@@ -49,9 +49,9 @@ func main() {
 		setFailed("prompt input is required and cannot be empty")
 		return
 	}
-	
+
 	if apiKey == "" && settingsJSON == "" {
-		setFailed("api-key input is required and cannot be empty")
+		setFailed("api_key input is required and cannot be empty")
 		return
 	}
 
@@ -61,7 +61,7 @@ func main() {
 		setFailed(fmt.Sprintf("Invalid timeout value: %s", timeoutStr))
 		return
 	}
-	
+
 	// Validate timeout range (1 second to 1 hour)
 	if timeout < 1 || timeout > 3600 {
 		setFailed(fmt.Sprintf("Timeout must be between 1 and 3600 seconds, got: %d", timeout))
@@ -96,7 +96,7 @@ func main() {
 
 	// Set outputs
 	setOutput("result", result)
-	setOutput("exit-code", fmt.Sprintf("%d", exitCode))
+	setOutput("exit_code", fmt.Sprintf("%d", exitCode))
 
 	if exitCode != 0 {
 		setFailed(fmt.Sprintf("iFlow CLI exited with code %d", exitCode))
@@ -145,19 +145,19 @@ func configureIFlow(apiKey, baseURL, model, settingsJSON string) error {
 	}
 
 	settingsFile := filepath.Join(iflowDir, "settings.json")
-	
+
 	var settingsData []byte
-	
+
 	if settingsJSON != "" {
 		// Use provided settings JSON directly
 		info("Using provided settings.json content")
-		
+
 		// Validate that it's valid JSON
 		var testSettings map[string]interface{}
 		if err := json.Unmarshal([]byte(settingsJSON), &testSettings); err != nil {
-			return fmt.Errorf("invalid settings-json provided: %w", err)
+			return fmt.Errorf("invalid settings_json provided: %w", err)
 		}
-		
+
 		// Pretty format the JSON
 		var prettyJSON json.RawMessage = []byte(settingsJSON)
 		settingsData, err = json.MarshalIndent(prettyJSON, "", "  ")
@@ -168,12 +168,12 @@ func configureIFlow(apiKey, baseURL, model, settingsJSON string) error {
 		// Create settings from individual parameters
 		info("Creating settings from individual parameters")
 		settings := IFlowSettings{
-			Theme:           "Default",
+			Theme:            "Default",
 			SelectedAuthType: "iflow",
-			APIKey:          apiKey,
-			BaseURL:         baseURL,
-			ModelName:       model,
-			SearchAPIKey:    apiKey,
+			APIKey:           apiKey,
+			BaseURL:          baseURL,
+			ModelName:        model,
+			SearchAPIKey:     apiKey,
 		}
 
 		settingsData, err = json.MarshalIndent(settings, "", "  ")
@@ -196,12 +196,12 @@ func executeIFlow(prompt string, timeoutSeconds int) (string, int, error) {
 
 	// Prepare the command with --prompt and --yolo flags by default
 	var cmd *exec.Cmd
-	
+
 	// Use --prompt and --yolo flags for all commands
 	cmd = exec.CommandContext(ctx, "iflow", "--prompt", prompt, "--yolo")
 
 	output, err := cmd.CombinedOutput()
-	
+
 	exitCode := 0
 	if err != nil {
 		if exitError, ok := err.(*exec.ExitError); ok {

@@ -9,13 +9,13 @@ inputs:
   prompt:
     description: 'The prompt to execute with iFlow CLI'
     required: true
-  api-key:
+  api_key:
     description: 'iFlow API key for authentication'
     required: false
-  settings-json:
+  settings_json:
     description: 'Complete iFlow settings.json content (JSON string). If provided, this will override other configuration options.'
     required: false
-  base-url:
+  base_url:
     description: 'Custom base URL for iFlow API'
     required: false
     default: 'https://apis.iflow.cn/v1'
@@ -23,7 +23,7 @@ inputs:
     description: 'Model name to use'
     required: false
     default: 'Qwen3-Coder'
-  working-directory:
+  working_directory:
     description: 'Working directory to run iFlow CLI from'
     required: false
     default: '.'
@@ -35,7 +35,7 @@ inputs:
 outputs:
   result:
     description: 'Output from iFlow CLI execution'
-  exit-code:
+  exit_code:
     description: 'Exit code from iFlow CLI execution'
 
 runs:

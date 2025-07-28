@@ -23,7 +23,7 @@ jobs:
         uses: vibe-ideas/iflow-cli-action@v1
         with:
           prompt: "Review this pull request for code quality and suggest improvements"
-          api-key: ${{ secrets.IFLOW_API_KEY }}
+          api_key: ${{ secrets.IFLOW_API_KEY }}
 ```
 
 ### Documentation Generation
@@ -43,7 +43,7 @@ jobs:
         uses: vibe-ideas/iflow-cli-action@v1
         with:
           prompt: "/init && Generate comprehensive documentation for this project"
-          api-key: ${{ secrets.IFLOW_API_KEY }}
+          api_key: ${{ secrets.IFLOW_API_KEY }}
           timeout: "600"
 ```
 
@@ -64,7 +64,7 @@ jobs:
         uses: vibe-ideas/iflow-cli-action@v1
         with:
           prompt: "Analyze this codebase for security vulnerabilities and provide recommendations"
-          api-key: ${{ secrets.IFLOW_API_KEY }}
+          api_key: ${{ secrets.IFLOW_API_KEY }}
           model: "DeepSeek-V3"
           timeout: "900"
 ```
@@ -87,14 +87,14 @@ jobs:
         uses: vibe-ideas/iflow-cli-action@v1
         with:
           prompt: "/init"
-          api-key: ${{ secrets.IFLOW_API_KEY }}
+          api_key: ${{ secrets.IFLOW_API_KEY }}
         id: init
       
       - name: Architecture Analysis
         uses: vibe-ideas/iflow-cli-action@v1
         with:
           prompt: "Based on the project analysis, provide detailed architecture recommendations"
-          api-key: ${{ secrets.IFLOW_API_KEY }}
+          api_key: ${{ secrets.IFLOW_API_KEY }}
           model: "Qwen3-Coder"
         id: arch
       
@@ -102,7 +102,7 @@ jobs:
         uses: vibe-ideas/iflow-cli-action@v1
         with:
           prompt: "Analyze the code for performance bottlenecks and optimization opportunities"
-          api-key: ${{ secrets.IFLOW_API_KEY }}
+          api_key: ${{ secrets.IFLOW_API_KEY }}
           model: "DeepSeek-V3"
         id: perf
       
@@ -129,9 +129,9 @@ jobs:
   uses: vibe-ideas/iflow-cli-action@v1
   with:
     prompt: "Analyze this code"
-    api-key: ${{ secrets.IFLOW_API_KEY }}
+    api_key: ${{ secrets.IFLOW_API_KEY }}
     model: "Kimi-K2"
-    base-url: "https://apis.iflow.cn/v1"
+    base_url: "https://apis.iflow.cn/v1"
 ```
 
 ### Extended Timeout for Complex Tasks
@@ -140,7 +140,7 @@ jobs:
   uses: vibe-ideas/iflow-cli-action@v1
   with:
     prompt: "Perform comprehensive code analysis and refactoring suggestions"
-    api-key: ${{ secrets.IFLOW_API_KEY }}
+    api_key: ${{ secrets.IFLOW_API_KEY }}
     timeout: "1800"  # 30 minutes
 ```
 
@@ -150,8 +150,8 @@ jobs:
   uses: vibe-ideas/iflow-cli-action@v1
   with:
     prompt: "Analyze this module for improvement opportunities"
-    api-key: ${{ secrets.IFLOW_API_KEY }}
-    working-directory: "./src/core"
+    api_key: ${{ secrets.IFLOW_API_KEY }}
+    working_directory: "./src/core"
 ```
 
 ## Setup Instructions

@@ -14,7 +14,7 @@ jobs:
         uses: vibe-ideas/iflow-cli-action@v1
         with:
           prompt: "Review this pull request for code quality, security issues, and best practices. Provide specific suggestions for improvement."
-          api-key: ${{ secrets.IFLOW_API_KEY }}
+          api_key: ${{ secrets.IFLOW_API_KEY }}
           model: "Qwen3-Coder"
           timeout: "600"
         id: review
