@@ -22,7 +22,7 @@ jobs:
       - name: Review Code
         uses: vibe-ideas/iflow-cli-action@v1
         with:
-          command: "Review this pull request for code quality and suggest improvements"
+          prompt: "Review this pull request for code quality and suggest improvements"
           api-key: ${{ secrets.IFLOW_API_KEY }}
 ```
 
@@ -42,7 +42,7 @@ jobs:
       - name: Generate Docs
         uses: vibe-ideas/iflow-cli-action@v1
         with:
-          command: "/init && Generate comprehensive documentation for this project"
+          prompt: "/init && Generate comprehensive documentation for this project"
           api-key: ${{ secrets.IFLOW_API_KEY }}
           timeout: "600"
 ```
@@ -63,7 +63,7 @@ jobs:
       - name: Security Scan
         uses: vibe-ideas/iflow-cli-action@v1
         with:
-          command: "Analyze this codebase for security vulnerabilities and provide recommendations"
+          prompt: "Analyze this codebase for security vulnerabilities and provide recommendations"
           api-key: ${{ secrets.IFLOW_API_KEY }}
           model: "DeepSeek-V3"
           timeout: "900"
@@ -86,14 +86,14 @@ jobs:
       - name: Project Overview
         uses: vibe-ideas/iflow-cli-action@v1
         with:
-          command: "/init"
+          prompt: "/init"
           api-key: ${{ secrets.IFLOW_API_KEY }}
         id: init
       
       - name: Architecture Analysis
         uses: vibe-ideas/iflow-cli-action@v1
         with:
-          command: "Based on the project analysis, provide detailed architecture recommendations"
+          prompt: "Based on the project analysis, provide detailed architecture recommendations"
           api-key: ${{ secrets.IFLOW_API_KEY }}
           model: "Qwen3-Coder"
         id: arch
@@ -101,7 +101,7 @@ jobs:
       - name: Performance Review
         uses: vibe-ideas/iflow-cli-action@v1
         with:
-          command: "Analyze the code for performance bottlenecks and optimization opportunities"
+          prompt: "Analyze the code for performance bottlenecks and optimization opportunities"
           api-key: ${{ secrets.IFLOW_API_KEY }}
           model: "DeepSeek-V3"
         id: perf
@@ -128,7 +128,7 @@ jobs:
 - name: Use Custom Model
   uses: vibe-ideas/iflow-cli-action@v1
   with:
-    command: "Analyze this code"
+    prompt: "Analyze this code"
     api-key: ${{ secrets.IFLOW_API_KEY }}
     model: "Kimi-K2"
     base-url: "https://apis.iflow.cn/v1"
@@ -139,7 +139,7 @@ jobs:
 - name: Complex Analysis
   uses: vibe-ideas/iflow-cli-action@v1
   with:
-    command: "Perform comprehensive code analysis and refactoring suggestions"
+    prompt: "Perform comprehensive code analysis and refactoring suggestions"
     api-key: ${{ secrets.IFLOW_API_KEY }}
     timeout: "1800"  # 30 minutes
 ```
@@ -149,7 +149,7 @@ jobs:
 - name: Analyze Specific Module
   uses: vibe-ideas/iflow-cli-action@v1
   with:
-    command: "Analyze this module for improvement opportunities"
+    prompt: "Analyze this module for improvement opportunities"
     api-key: ${{ secrets.IFLOW_API_KEY }}
     working-directory: "./src/core"
 ```
@@ -166,7 +166,7 @@ jobs:
 2. **Create Workflow File:**
    - Create `.github/workflows/` directory in your repository
    - Add one of the example workflows above
-   - Customize the `command` and other parameters as needed
+   - Customize the `prompt` and other parameters as needed
 
 3. **Test the Workflow:**
    - Commit and push the workflow file

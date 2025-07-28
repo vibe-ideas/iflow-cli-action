@@ -24,7 +24,7 @@ type IFlowSettings struct {
 
 func main() {
 	// Get inputs from environment variables (GitHub Actions convention)
-	command := strings.TrimSpace(getInput("command"))
+	prompt := strings.TrimSpace(getInput("prompt"))
 	apiKey := getInput("api-key")
 	settingsJSON := getInput("settings-json")
 	baseURL := getInput("base-url")
@@ -45,8 +45,8 @@ func main() {
 	}
 
 	// Validate required inputs
-	if command == "" {
-		setFailed("command input is required and cannot be empty")
+	if prompt == "" {
+		setFailed("prompt input is required and cannot be empty")
 		return
 	}
 	
@@ -87,8 +87,8 @@ func main() {
 	}
 
 	// Execute iFlow CLI command with --prompt and --yolo flags
-	info(fmt.Sprintf("Executing iFlow CLI command with --prompt and --yolo: %s", command))
-	result, exitCode, err := executeIFlow(command, timeout)
+	info(fmt.Sprintf("Executing iFlow CLI prompt with --prompt and --yolo: %s", prompt))
+	result, exitCode, err := executeIFlow(prompt, timeout)
 	if err != nil {
 		setFailed(fmt.Sprintf("Failed to execute iFlow CLI: %v", err))
 		return
@@ -190,7 +190,7 @@ func configureIFlow(apiKey, baseURL, model, settingsJSON string) error {
 	return nil
 }
 
-func executeIFlow(command string, timeoutSeconds int) (string, int, error) {
+func executeIFlow(prompt string, timeoutSeconds int) (string, int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeoutSeconds)*time.Second)
 	defer cancel()
 
@@ -198,7 +198,7 @@ func executeIFlow(command string, timeoutSeconds int) (string, int, error) {
 	var cmd *exec.Cmd
 	
 	// Use --prompt and --yolo flags for all commands
-	cmd = exec.CommandContext(ctx, "iflow", "--prompt", command, "--yolo")
+	cmd = exec.CommandContext(ctx, "iflow", "--prompt", prompt, "--yolo")
 
 	output, err := cmd.CombinedOutput()
 	

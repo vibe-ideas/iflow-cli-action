@@ -34,12 +34,12 @@ jobs:
       - name: Generate homepage content using iFlow CLI
         uses: ./
         with:
-          command: |
+          prompt: |
             Generate a beautiful HTML homepage for the iFlow CLI Action GitHub repository. 
             Include:
             - Project title and description mentioning automatic --prompt and --yolo flags
             - Key features and benefits highlighting streamlined non-interactive execution
-            - Usage examples with code snippets showing simple command syntax
+            - Usage examples with code snippets showing simple prompt syntax
             - Links to documentation and examples
             - Modern, responsive design with CSS styling
             - Use the favicon: https://img.alicdn.com/imgextra/i1/O1CN01nulwex1q7Eq1TVqUh_!!6000000005448-55-tps-32-32.svg
@@ -171,7 +171,7 @@ jobs:
           - name: AI Code Review
             uses: vibe-ideas/iflow-cli-action@v1
             with:
-              command: "Review this pull request for code quality and suggest improvements"
+              prompt: "Review this pull request for code quality and suggest improvements"
               api-key: ${{ secrets.IFLOW_API_KEY }}
               model: "Qwen3-Coder"
                       </pre>
@@ -183,7 +183,7 @@ jobs:
           - name: Custom Configuration
             uses: vibe-ideas/iflow-cli-action@v1
             with:
-              command: "Generate comprehensive documentation for this project"
+              prompt: "Generate comprehensive documentation for this project"
               api-key: ${{ secrets.IFLOW_API_KEY }}
               settings-json: |
                 {

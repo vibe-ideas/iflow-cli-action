@@ -28,7 +28,7 @@ jobs:
       - name: Run iFlow CLI
         uses: vibe-ideas/iflow-cli-action@v1
         with:
-          command: "Analyze this codebase and suggest improvements"
+          prompt: "Analyze this codebase and suggest improvements"
           api-key: ${{ secrets.IFLOW_API_KEY }}
 ```
 
@@ -49,7 +49,7 @@ jobs:
       - name: Initialize Project Analysis
         uses: vibe-ideas/iflow-cli-action@v1
         with:
-          command: "/init"
+          prompt: "/init"
           api-key: ${{ secrets.IFLOW_API_KEY }}
           model: "Qwen3-Coder"
           timeout: "600"
@@ -58,7 +58,7 @@ jobs:
       - name: Generate Technical Documentation
         uses: vibe-ideas/iflow-cli-action@v1
         with:
-          command: "Generate technical documentation based on the codebase analysis"
+          prompt: "Generate technical documentation based on the codebase analysis"
           api-key: ${{ secrets.IFLOW_API_KEY }}
           base-url: "https://apis.iflow.cn/v1"
           model: "DeepSeek-V3"
@@ -85,7 +85,7 @@ jobs:
       - name: Project Overview
         uses: vibe-ideas/iflow-cli-action@v1
         with:
-          command: |
+          prompt: |
             Analyze the project structure and provide:
             1. Main architectural components
             2. Key dependencies and their purposes
@@ -96,7 +96,7 @@ jobs:
       - name: Code Quality Assessment
         uses: vibe-ideas/iflow-cli-action@v1
         with:
-          command: "Review the code for best practices, potential bugs, and performance improvements"
+          prompt: "Review the code for best practices, potential bugs, and performance improvements"
           api-key: ${{ secrets.IFLOW_API_KEY }}
           model: "Kimi-K2"
 ```
@@ -105,7 +105,7 @@ jobs:
 
 | Input | Description | Required | Default |
 |-------|-------------|----------|---------|
-| `command` | The iFlow CLI command to execute | ✅ Yes | - |
+| `prompt` | The prompt to execute with iFlow CLI | ✅ Yes | - |
 | `api-key` | iFlow API key for authentication | ✅ Yes | - |
 | `settings-json` | Complete iFlow settings.json content (JSON string). If provided, this will override other configuration options. | ❌ No | - |
 | `base-url` | Custom base URL for iFlow API | ❌ No | `https://apis.iflow.cn/v1` |
@@ -146,7 +146,7 @@ For advanced users who need complete control over the iFlow configuration, you c
 - name: Custom iFlow Configuration
   uses: vibe-ideas/iflow-cli-action@v1
   with:
-    command: "Analyze this codebase with custom configuration"
+    prompt: "Analyze this codebase with custom configuration"
     api-key: ${{ secrets.IFLOW_API_KEY }}  # Still required for basic validation
     settings-json: |
       {
@@ -177,7 +177,7 @@ When `settings-json` is provided, it takes precedence over individual configurat
 - name: Code Review
   uses: vibe-ideas/iflow-cli-action@v1
   with:
-    command: "Review this pull request for code quality, security issues, and best practices"
+    prompt: "Review this pull request for code quality, security issues, and best practices"
     api-key: ${{ secrets.IFLOW_API_KEY }}
 ```
 
@@ -187,7 +187,7 @@ When `settings-json` is provided, it takes precedence over individual configurat
 - name: Generate Documentation
   uses: vibe-ideas/iflow-cli-action@v1
   with:
-    command: "/init && Generate comprehensive API documentation"
+    prompt: "/init && Generate comprehensive API documentation"
     api-key: ${{ secrets.IFLOW_API_KEY }}
     timeout: "600"
 ```
@@ -198,7 +198,7 @@ When `settings-json` is provided, it takes precedence over individual configurat
 - name: Test Strategy
   uses: vibe-ideas/iflow-cli-action@v1
   with:
-    command: "Analyze the codebase and suggest a comprehensive testing strategy with specific test cases"
+    prompt: "Analyze the codebase and suggest a comprehensive testing strategy with specific test cases"
     api-key: ${{ secrets.IFLOW_API_KEY }}
     model: "DeepSeek-V3"
 ```
@@ -209,7 +209,7 @@ When `settings-json` is provided, it takes precedence over individual configurat
 - name: Architecture Review
   uses: vibe-ideas/iflow-cli-action@v1
   with:
-    command: "Analyze the system architecture and suggest improvements for scalability and maintainability"
+    prompt: "Analyze the system architecture and suggest improvements for scalability and maintainability"
     api-key: ${{ secrets.IFLOW_API_KEY }}
     timeout: "900"
 ```

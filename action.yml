@@ -6,8 +6,8 @@ branding:
   color: 'blue'
 
 inputs:
-  command:
-    description: 'The iFlow CLI command to execute'
+  prompt:
+    description: 'The prompt to execute with iFlow CLI'
     required: true
   api-key:
     description: 'iFlow API key for authentication'
