@@ -24,17 +24,18 @@ RUN apt-get update && apt-get install -y git ca-certificates curl
 # Set working directory
 WORKDIR /app
 
-# Copy go mod files
-COPY go.mod ./
+# Copy go mod files first for better layer caching
+COPY go.mod go.sum ./
 
 # Download dependencies
 RUN go mod download
 
 # Copy source code
 COPY main.go ./
+COPY cmd/ ./cmd/
 
 # Build the application
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o iflow-action main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o iflow-action .
 
 # Final stage - copy Go binary to Node.js runtime
 FROM runtime-base
