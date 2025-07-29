@@ -38,3 +38,6 @@ tmp/
 
 # Log files
 *.log
+
+
+test_local.sh
