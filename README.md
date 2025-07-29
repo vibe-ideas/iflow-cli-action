@@ -2,6 +2,8 @@
 
 A GitHub Action that enables you to run [iFlow CLI](https://github.com/iflow-ai/iflow-cli) commands within your GitHub workflows. This Docker-based action comes with Node.js 22 and npm pre-installed for optimal performance, and executes your specified commands using the iFlow CLI.
 
+> Docs Site (generated with iFlow CLI GitHub Action): [https://vibe-ideas.github.io/iflow-cli-action/](https://vibe-ideas.github.io/iflow-cli-action/)
+
 ## Features
 
 - ✅ Docker-based action with pre-installed Node.js 22 and npm
