@@ -76,6 +76,9 @@ func init() {
 }
 
 func runIFlowAction() error {
+	// Print iFlow CLI version
+	printIFlowVersion()
+	
 	// If use-env-vars is set or we detect GitHub Actions environment, use environment variables
 	if config.UseEnvVars || isGitHubActions() {
 		if err := loadConfigFromEnv(); err != nil {
@@ -246,6 +249,17 @@ func info(message string) {
 func setFailed(message string) {
 	fmt.Printf("::error::%s\n", message)
 	os.Exit(1)
+}
+
+func printIFlowVersion() {
+	// Run iflow --version and print the output
+	cmd := exec.Command("iflow", "--version")
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		info(fmt.Sprintf("Warning: Failed to get iFlow version: %v", err))
+		return
+	}
+	info(fmt.Sprintf("iFlow CLI version: %s", strings.TrimSpace(string(output))))
 }
 
 func configureIFlow() error {
