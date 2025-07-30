@@ -28,9 +28,9 @@ inputs:
     required: false
     default: '.'
   timeout:
-    description: 'Timeout for iFlow CLI execution in seconds'
+    description: 'Timeout for iFlow CLI execution in seconds (1-3600)'
     required: false
-    default: '300'
+    default: "3600"
 
 outputs:
   result:

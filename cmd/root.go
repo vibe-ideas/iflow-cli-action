@@ -24,6 +24,7 @@ type Config struct {
 	WorkingDir   string
 	Timeout      int
 	UseEnvVars   bool // Flag to indicate whether to use environment variables (GitHub Actions mode)
+	IsTimeout    bool // Flag to indicate if execution timed out
 }
 
 // IFlowSettings represents the iFlow configuration
@@ -68,7 +69,7 @@ func init() {
 	rootCmd.Flags().StringVar(&config.BaseURL, "base-url", "https://apis.iflow.cn/v1", "Base URL for the iFlow API")
 	rootCmd.Flags().StringVar(&config.Model, "model", "Qwen3-Coder", "Model name to use")
 	rootCmd.Flags().StringVar(&config.WorkingDir, "working-directory", ".", "Working directory for execution")
-	rootCmd.Flags().IntVar(&config.Timeout, "timeout", 300, "Timeout in seconds (1-3600)")
+	rootCmd.Flags().IntVar(&config.Timeout, "timeout", 3600, "Timeout in seconds (1-3600)")
 	rootCmd.Flags().BoolVar(&config.UseEnvVars, "use-env-vars", false, "Use environment variables for configuration (GitHub Actions mode)")
 
 	// Mark required flags only if not in GitHub Actions mode - this will be validated later
@@ -105,6 +106,7 @@ func runIFlowAction() error {
 
 	// Execute iFlow CLI command with --prompt and --yolo flags
 	info(fmt.Sprintf("Executing iFlow CLI prompt with --prompt and --yolo: %s", config.Prompt))
+	info(fmt.Sprintf("Command timeout set to: %d seconds", config.Timeout))
 	result, exitCode, err := executeIFlow()
 	if err != nil {
 		return fmt.Errorf("failed to execute iFlow CLI: %w", err)
@@ -160,11 +162,16 @@ func loadConfigFromEnv() error {
 		config.WorkingDir = workingDir
 	}
 	if timeoutStr := getInput("timeout"); timeoutStr != "" {
+		info(fmt.Sprintf("Parsing timeout value from input: '%s'", timeoutStr))
 		timeout, err := strconv.Atoi(timeoutStr)
 		if err != nil {
-			return fmt.Errorf("invalid timeout value: %s", timeoutStr)
+			if config.UseEnvVars || isGitHubActions() {
+				setFailed(fmt.Sprintf("Invalid timeout value: '%s'. Timeout must be a valid integer between 1 and 3600 seconds.", timeoutStr))
+			}
+			return fmt.Errorf("invalid timeout value: '%s'. Timeout must be a valid integer between 1 and 3600 seconds", timeoutStr)
 		}
 		config.Timeout = timeout
+		info(fmt.Sprintf("Timeout value set to: %d seconds", config.Timeout))
 	}
 
 	return nil
@@ -191,9 +198,9 @@ func validateConfig() error {
 	// Validate timeout range (1 second to 1 hour)
 	if config.Timeout < 1 || config.Timeout > 3600 {
 		if config.UseEnvVars || isGitHubActions() {
-			setFailed(fmt.Sprintf("Timeout must be between 1 and 3600 seconds, got: %d", config.Timeout))
+			setFailed(fmt.Sprintf("Timeout value %d is out of range. Timeout must be between 1 and 3600 seconds (1 hour).", config.Timeout))
 		}
-		return fmt.Errorf("timeout must be between 1 and 3600 seconds, got: %d", config.Timeout)
+		return fmt.Errorf("timeout value %d is out of range. Timeout must be between 1 and 3600 seconds (1 hour)", config.Timeout)
 	}
 
 	return nil
@@ -313,7 +320,12 @@ func executeIFlow() (string, int, error) {
 		if exitError, ok := err.(*exec.ExitError); ok {
 			exitCode = exitError.ExitCode()
 		} else {
-			// Non-exit error (e.g., timeout, command not found)
+			// Check if the error is due to context timeout
+			if ctx.Err() == context.DeadlineExceeded {
+				config.IsTimeout = true
+				return string(output), 124, fmt.Errorf("command timed out after %d seconds", config.Timeout)
+			}
+			// Non-exit error (e.g., command not found)
 			return string(output), 1, err
 		}
 	}
@@ -349,7 +361,9 @@ func generateSummaryMarkdown(result string, exitCode int) string {
 	var summary strings.Builder
 
 	// Add header with emoji based on status
-	if exitCode == 0 {
+	if config.IsTimeout {
+		summary.WriteString("## ⏰ iFlow CLI Execution Summary - Timeout\n\n")
+	} else if exitCode == 0 {
 		summary.WriteString("## ✅ iFlow CLI Execution Summary\n\n")
 	} else {
 		summary.WriteString("## ❌ iFlow CLI Execution Summary\n\n")
@@ -357,7 +371,11 @@ func generateSummaryMarkdown(result string, exitCode int) string {
 
 	// Add execution status with more detail
 	summary.WriteString("### 📊 Status\n\n")
-	if exitCode == 0 {
+	if config.IsTimeout {
+		summary.WriteString("⏰ **Execution**: Timed Out\n")
+		summary.WriteString(fmt.Sprintf("🕒 **Timeout Duration**: %d seconds\n", config.Timeout))
+		summary.WriteString(fmt.Sprintf("💥 **Exit Code**: %d\n\n", exitCode))
+	} else if exitCode == 0 {
 		summary.WriteString("🎉 **Execution**: Successful\n")
 		summary.WriteString("🎯 **Exit Code**: 0\n\n")
 	} else {
@@ -418,7 +436,19 @@ func generateSummaryMarkdown(result string, exitCode int) string {
 		summary.WriteString("\n```\n\n")
 
 		// Add troubleshooting hints for common errors
-		if strings.Contains(result, "API Error") {
+		if config.IsTimeout {
+			summary.WriteString("#### ⏰ Timeout Information\n\n")
+			summary.WriteString(fmt.Sprintf("- **Configured Timeout**: %d seconds\n", config.Timeout))
+			summary.WriteString("- **Reason**: The iFlow CLI command did not complete within the specified timeout period\n")
+			summary.WriteString("- **Exit Code**: 124 (timeout)\n\n")
+
+			summary.WriteString("#### 🔧 Timeout Troubleshooting\n\n")
+			summary.WriteString("- **Increase timeout**: Consider increasing the timeout value if the task legitimately needs more time\n")
+			summary.WriteString("- **Optimize prompt**: Try breaking down complex prompts into smaller, more focused requests\n")
+			summary.WriteString("- **Check model performance**: Some models may require longer processing time\n")
+			summary.WriteString("- **Network issues**: Verify network connectivity and API response times\n")
+			summary.WriteString("- **Resource constraints**: Check if the system has sufficient resources (CPU, memory)\n\n")
+		} else if strings.Contains(result, "API Error") {
 			summary.WriteString("#### 🔧 Troubleshooting Hints\n\n")
 			summary.WriteString("- Check if your API key is valid and active\n")
 			summary.WriteString("- Verify the base URL is accessible\n")
@@ -431,7 +461,10 @@ func generateSummaryMarkdown(result string, exitCode int) string {
 	summary.WriteString("### 📈 Metrics\n\n")
 	summary.WriteString(fmt.Sprintf("- **Execution Time**: %s\n", time.Now().UTC().Format("2006-01-02 15:04:05 UTC")))
 	summary.WriteString(fmt.Sprintf("- **Output Length**: %d characters\n", len(result)))
-	if exitCode == 0 {
+	if config.IsTimeout {
+		summary.WriteString(fmt.Sprintf("- **Timeout Duration**: %d seconds\n", config.Timeout))
+		summary.WriteString("- **Success Rate**: 0% (Timeout)\n\n")
+	} else if exitCode == 0 {
 		summary.WriteString("- **Success Rate**: 100%\n\n")
 	} else {
 		summary.WriteString("- **Success Rate**: 0%\n\n")
