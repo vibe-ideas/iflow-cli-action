@@ -29,7 +29,7 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: 运行 iFlow CLI
-        uses: vibe-ideas/iflow-cli-action@v1.0.0
+        uses: vibe-ideas/iflow-cli-action@v1.1.0
         with:
           prompt: "分析此代码库并提出改进建议"
           api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -50,7 +50,7 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: 初始化项目分析
-        uses: vibe-ideas/iflow-cli-action@v1.0.0
+        uses: vibe-ideas/iflow-cli-action@v1.1.0
         with:
           prompt: "/init"
           api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -59,7 +59,7 @@ jobs:
           working_directory: "."
       
       - name: 生成技术文档
-        uses: vibe-ideas/iflow-cli-action@v1.0.0
+        uses: vibe-ideas/iflow-cli-action@v1.1.0
         with:
           prompt: "根据代码库分析生成技术文档"
           api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -86,7 +86,7 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: 项目概览
-        uses: vibe-ideas/iflow-cli-action@v1.0.0
+        uses: vibe-ideas/iflow-cli-action@v1.1.0
         with:
           prompt: |
             分析项目结构并提供：
@@ -97,7 +97,7 @@ jobs:
           timeout: "900"
       
       - name: 代码质量评估
-        uses: vibe-ideas/iflow-cli-action@v1.0.0
+        uses: vibe-ideas/iflow-cli-action@v1.1.0
         with:
           prompt: "审查代码以了解最佳实践、潜在错误和性能改进"
           api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -141,13 +141,11 @@ jobs:
 
 ## 自定义配置
 
-### 使用自定义设置
-
-对于需要完全控制 iFlow 配置的高级用户，您可以直接提供自定义的 `settings.json`：
+### 自定义 iFlow 配置
 
 ```yaml
 - name: 自定义 iFlow 配置
-  uses: vibe-ideas/iflow-cli-action@v1.0.0
+  uses: vibe-ideas/iflow-cli-action@v1.1.0
   with:
     prompt: "使用自定义配置分析此代码库"
     api_key: ${{ secrets.IFLOW_API_KEY }}  # 仍需要用于基本验证
@@ -163,22 +161,13 @@ jobs:
       }
 ```
 
-当提供 `settings_json` 时，它优先于单个配置输入（`base_url`、`model` 等）。这允许您：
-
-- 使用自定义认证类型
-- 配置输入中不可用的附加字段
-- 在多个工作流运行中维护复杂配置
-- 支持自定义 API 端点和模型
-
-**注意：** 仍需要 `api_key` 输入进行验证，但实际使用的 API 密钥将是您在 `settings_json` 中指定的密钥。
-
 ## 常见用例
 
 ### 代码分析和审查
 
 ```yaml
 - name: 代码审查
-  uses: vibe-ideas/iflow-cli-action@v1.0.0
+  uses: vibe-ideas/iflow-cli-action@v1.1.0
   with:
     prompt: "审查此拉取请求的代码质量、安全问题和最佳实践"
     api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -188,7 +177,7 @@ jobs:
 
 ```yaml
 - name: 生成文档
-  uses: vibe-ideas/iflow-cli-action@v1.0.0
+  uses: vibe-ideas/iflow-cli-action@v1.1.0
   with:
     prompt: "/init && 生成全面的 API 文档"
     api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -199,7 +188,7 @@ jobs:
 
 ```yaml
 - name: 测试策略
-  uses: vibe-ideas/iflow-cli-action@v1.0.0
+  uses: vibe-ideas/iflow-cli-action@v1.1.0
   with:
     prompt: "分析代码库并建议全面的测试策略和具体测试用例"
     api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -210,7 +199,7 @@ jobs:
 
 ```yaml
 - name: 架构审查
-  uses: vibe-ideas/iflow-cli-action@v1.0.0
+  uses: vibe-ideas/iflow-cli-action@v1.1.0
   with:
     prompt: "分析系统架构并提出可扩展性和可维护性的改进建议"
     api_key: ${{ secrets.IFLOW_API_KEY }}

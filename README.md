@@ -31,7 +31,7 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: Run iFlow CLI
-        uses: vibe-ideas/iflow-cli-action@v1.0.0
+        uses: vibe-ideas/iflow-cli-action@v1.1.0
         with:
           prompt: "Analyze this codebase and suggest improvements"
           api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -52,7 +52,7 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: Initialize Project Analysis
-        uses: vibe-ideas/iflow-cli-action@v1.0.0
+        uses: vibe-ideas/iflow-cli-action@v1.1.0
         with:
           prompt: "/init"
           api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -61,7 +61,7 @@ jobs:
           working_directory: "."
       
       - name: Generate Technical Documentation
-        uses: vibe-ideas/iflow-cli-action@v1.0.0
+        uses: vibe-ideas/iflow-cli-action@v1.1.0
         with:
           prompt: "Generate technical documentation based on the codebase analysis"
           api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -88,7 +88,7 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: Project Overview
-        uses: vibe-ideas/iflow-cli-action@v1.0.0
+        uses: vibe-ideas/iflow-cli-action@v1.1.0
         with:
           prompt: |
             Analyze the project structure and provide:
@@ -99,7 +99,7 @@ jobs:
           timeout: "900"
       
       - name: Code Quality Assessment
-        uses: vibe-ideas/iflow-cli-action@v1.0.0
+        uses: vibe-ideas/iflow-cli-action@v1.1.0
         with:
           prompt: "Review the code for best practices, potential bugs, and performance improvements"
           api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -180,7 +180,7 @@ When `settings_json` is provided, it takes precedence over individual configurat
 
 ```yaml
 - name: Code Review
-  uses: vibe-ideas/iflow-cli-action@v1.0.0
+  uses: vibe-ideas/iflow-cli-action@v1.1.0
   with:
     prompt: "Review this pull request for code quality, security issues, and best practices"
     api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -190,7 +190,7 @@ When `settings_json` is provided, it takes precedence over individual configurat
 
 ```yaml
 - name: Generate Documentation
-  uses: vibe-ideas/iflow-cli-action@v1.0.0
+  uses: vibe-ideas/iflow-cli-action@v1.1.0
   with:
     prompt: "/init && Generate comprehensive API documentation"
     api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -201,7 +201,7 @@ When `settings_json` is provided, it takes precedence over individual configurat
 
 ```yaml
 - name: Test Strategy
-  uses: vibe-ideas/iflow-cli-action@v1.0.0
+  uses: vibe-ideas/iflow-cli-action@v1.1.0
   with:
     prompt: "Analyze the codebase and suggest a comprehensive testing strategy with specific test cases"
     api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -212,7 +212,7 @@ When `settings_json` is provided, it takes precedence over individual configurat
 
 ```yaml
 - name: Architecture Review
-  uses: vibe-ideas/iflow-cli-action@v1.0.0
+  uses: vibe-ideas/iflow-cli-action@v1.1.0
   with:
     prompt: "Analyze the system architecture and suggest improvements for scalability and maintainability"
     api_key: ${{ secrets.IFLOW_API_KEY }}
