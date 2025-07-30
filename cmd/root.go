@@ -315,16 +315,17 @@ func executeIFlow() (string, int, error) {
 
 	output, err := cmd.CombinedOutput()
 
+	// Check for timeout first, regardless of error type
+	if ctx.Err() == context.DeadlineExceeded {
+		config.IsTimeout = true
+		return string(output), 124, fmt.Errorf("command timed out after %d seconds", config.Timeout)
+	}
+
 	exitCode := 0
 	if err != nil {
 		if exitError, ok := err.(*exec.ExitError); ok {
 			exitCode = exitError.ExitCode()
 		} else {
-			// Check if the error is due to context timeout
-			if ctx.Err() == context.DeadlineExceeded {
-				config.IsTimeout = true
-				return string(output), 124, fmt.Errorf("command timed out after %d seconds", config.Timeout)
-			}
 			// Non-exit error (e.g., command not found)
 			return string(output), 1, err
 		}
