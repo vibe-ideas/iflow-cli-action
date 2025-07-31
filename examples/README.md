@@ -7,6 +7,7 @@ This directory contains example GitHub Actions workflows demonstrating how to us
 ## Basic Examples
 
 ### Code Review on Pull Request
+
 ```yaml
 # .github/workflows/iflow-review.yml
 name: iFlow Code Review
@@ -27,6 +28,7 @@ jobs:
 ```
 
 ### Documentation Generation
+
 ```yaml
 # .github/workflows/generate-docs.yml
 name: Generate Documentation
@@ -47,7 +49,34 @@ jobs:
           timeout: "600"
 ```
 
+### Using Extra Arguments
+
+```yaml
+# .github/workflows/custom-args.yml
+name: iFlow with Custom Arguments
+on:
+  workflow_dispatch:
+    inputs:
+      extra_flags:
+        description: 'Additional iFlow CLI flags'
+        required: false
+        default: ''
+
+jobs:
+  custom:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run iFlow with Custom Args
+        uses: vibe-ideas/iflow-cli-action@v1
+        with:
+          prompt: "Analyze the codebase and provide insights"
+          api_key: ${{ secrets.IFLOW_API_KEY }}
+          extra_args: "--debug"
+```
+
 ### Security Analysis
+
 ```yaml
 # .github/workflows/security-scan.yml
 name: Security Analysis
@@ -72,6 +101,7 @@ jobs:
 ## Advanced Examples
 
 ### Multi-step Analysis
+
 ```yaml
 # .github/workflows/comprehensive-analysis.yml
 name: Comprehensive Analysis
@@ -124,6 +154,7 @@ jobs:
 ## Configuration Examples
 
 ### Custom Model Configuration
+
 ```yaml
 - name: Use Custom Model
   uses: vibe-ideas/iflow-cli-action@v1
@@ -135,6 +166,7 @@ jobs:
 ```
 
 ### Extended Timeout for Complex Tasks
+
 ```yaml
 - name: Complex Analysis
   uses: vibe-ideas/iflow-cli-action@v1
@@ -145,6 +177,7 @@ jobs:
 ```
 
 ### Different Working Directory
+
 ```yaml
 - name: Analyze Specific Module
   uses: vibe-ideas/iflow-cli-action@v1

@@ -116,7 +116,8 @@ jobs:
 | `base_url` | Custom base URL for iFlow API | ❌ No | `https://apis.iflow.cn/v1` |
 | `model` | Model name to use | ❌ No | `Qwen3-Coder` |
 | `working_directory` | Working directory to run iFlow CLI from | ❌ No | `.` |
-| `timeout` | Timeout for iFlow CLI execution in seconds | ❌ No | `300` |
+| `timeout` | Timeout for iFlow CLI execution in seconds (1-3600) | ❌ No | `3600` |
+| `extra_args` | Additional command line arguments to pass to iFlow CLI (space-separated string) | ❌ No | `` |
 
 ## Outputs
 
@@ -130,7 +131,7 @@ jobs:
 ### Getting an iFlow API Key
 
 1. Register for an iFlow account at [iflow.cn](https://iflow.cn)
-2. Go to your profile settings or [click here](https://iflow.cn/?open=setting)
+2. Go to your profile settings or [click here to get your API key](https://iflow.cn/?open=setting)
 3. Click "Reset" in the pop-up dialog to generate a new API key
 4. Add the API key to your GitHub repository secrets as `IFLOW_API_KEY`
 
@@ -142,6 +143,31 @@ jobs:
 - Custom models supported via OpenAI-compatible APIs
 
 ## Custom Configuration
+
+### Using Extra Arguments
+
+The `extra_args` input allows you to pass additional command-line arguments directly to the iFlow CLI. This provides flexibility to use advanced iFlow CLI features that aren't exposed as dedicated action inputs.
+
+```yaml
+- name: iFlow with Custom Arguments
+  uses: vibe-ideas/iflow-cli-action@v1.0.0
+  with:
+    prompt: "Analyze this codebase with debug output"
+    api_key: ${{ secrets.IFLOW_API_KEY }}
+    extra_args: "--debug --max-tokens 3000"
+```
+
+#### Examples of Extra Arguments
+
+- `--debug` - Enable debug mode  
+
+#### Quoted Arguments
+
+For arguments containing spaces, use quotes:
+
+```yaml
+extra_args: '--debug'
+```
 
 ### Using Custom Settings
 
@@ -230,6 +256,7 @@ When `settings_json` is provided, it takes precedence over individual configurat
 ### Common Issues
 
 **Command timeout:** Increase the `timeout` value for complex operations
+
 ```yaml
 timeout: "900"  # 15 minutes
 ```
@@ -237,6 +264,7 @@ timeout: "900"  # 15 minutes
 **API authentication failed:** Verify your API key is correctly set in repository secrets
 
 **Working directory not found:** Ensure the path exists and checkout action is used
+
 ```yaml
 - uses: actions/checkout@v4  # Required before using iFlow action
 ```
@@ -244,6 +272,7 @@ timeout: "900"  # 15 minutes
 ### Debug Mode
 
 Enable verbose logging by setting environment variables:
+
 ```yaml
 env:
   ACTIONS_STEP_DEBUG: true

@@ -31,6 +31,10 @@ inputs:
     description: 'Timeout for iFlow CLI execution in seconds (1-3600)'
     required: false
     default: "3600"
+  extra_args:
+    description: 'Additional command line arguments to pass to iFlow CLI (space-separated string)'
+    required: false
+    default: ''
 
 outputs:
   result:

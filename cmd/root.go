@@ -23,8 +23,9 @@ type Config struct {
 	Model        string
 	WorkingDir   string
 	Timeout      int
-	UseEnvVars   bool // Flag to indicate whether to use environment variables (GitHub Actions mode)
-	IsTimeout    bool // Flag to indicate if execution timed out
+	ExtraArgs    string // Additional command line arguments for iFlow CLI
+	UseEnvVars   bool   // Flag to indicate whether to use environment variables (GitHub Actions mode)
+	IsTimeout    bool   // Flag to indicate if execution timed out
 }
 
 // IFlowSettings represents the iFlow configuration
@@ -38,6 +39,11 @@ type IFlowSettings struct {
 }
 
 var config Config
+
+// For testing purposes, expose the config
+func GetConfig() Config {
+	return config
+}
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -70,6 +76,7 @@ func init() {
 	rootCmd.Flags().StringVar(&config.Model, "model", "Qwen3-Coder", "Model name to use")
 	rootCmd.Flags().StringVar(&config.WorkingDir, "working-directory", ".", "Working directory for execution")
 	rootCmd.Flags().IntVar(&config.Timeout, "timeout", 3600, "Timeout in seconds (1-3600)")
+	rootCmd.Flags().StringVar(&config.ExtraArgs, "extra-args", "", "Additional command line arguments to pass to iFlow CLI")
 	rootCmd.Flags().BoolVar(&config.UseEnvVars, "use-env-vars", false, "Use environment variables for configuration (GitHub Actions mode)")
 
 	// Mark required flags only if not in GitHub Actions mode - this will be validated later
@@ -78,7 +85,7 @@ func init() {
 func runIFlowAction() error {
 	// Print iFlow CLI version
 	printIFlowVersion()
-	
+
 	// If use-env-vars is set or we detect GitHub Actions environment, use environment variables
 	if config.UseEnvVars || isGitHubActions() {
 		if err := loadConfigFromEnv(); err != nil {
@@ -144,7 +151,9 @@ func isGitHubActions() bool {
 	return os.Getenv("GITHUB_ACTIONS") == "true"
 }
 
-func loadConfigFromEnv() error {
+// LoadConfigFromEnv loads configuration from environment variables (GitHub Actions convention)
+// This function is exported for testing purposes
+func LoadConfigFromEnv() error {
 	// Load configuration from environment variables (GitHub Actions convention)
 	if prompt := getInput("prompt"); prompt != "" {
 		config.Prompt = strings.TrimSpace(prompt)
@@ -177,7 +186,17 @@ func loadConfigFromEnv() error {
 		info(fmt.Sprintf("Timeout value set to: %d seconds", config.Timeout))
 	}
 
+	if extraArgs := getInput("extra_args"); extraArgs != "" {
+		config.ExtraArgs = strings.TrimSpace(extraArgs)
+		info(fmt.Sprintf("Extra arguments set to: '%s'", config.ExtraArgs))
+	}
+
 	return nil
+}
+
+// For backward compatibility
+func loadConfigFromEnv() error {
+	return LoadConfigFromEnv()
 }
 
 func validateConfig() error {
@@ -325,7 +344,16 @@ func executeIFlow() (string, int, error) {
 
 	// Prepare the command with --prompt and --yolo flags by default
 	// Use --prompt and --yolo flags for all commands
-	cmd := exec.CommandContext(ctx, "iflow", "--yolo", "--prompt", config.Prompt)
+	args := []string{"--yolo", "--prompt", config.Prompt}
+
+	// Parse and add extra arguments if provided
+	if config.ExtraArgs != "" {
+		extraArgs := parseExtraArgs(config.ExtraArgs)
+		args = append(args, extraArgs...)
+		info(fmt.Sprintf("Using additional arguments: %v", extraArgs))
+	}
+
+	cmd := exec.CommandContext(ctx, "iflow", args...)
 
 	output, err := cmd.CombinedOutput()
 
@@ -346,6 +374,57 @@ func executeIFlow() (string, int, error) {
 	}
 
 	return string(output), exitCode, nil
+}
+
+// parseExtraArgs parses a space-separated string of arguments into a slice
+// Handles quoted arguments with spaces properly
+func parseExtraArgs(extraArgs string) []string {
+	if extraArgs == "" {
+		return []string{}
+	}
+
+	var args []string
+	var current strings.Builder
+	inQuotes := false
+	var quoteChar rune
+
+	for i, char := range extraArgs {
+		switch char {
+		case '"', '\'':
+			if !inQuotes {
+				// Start of quoted string
+				inQuotes = true
+				quoteChar = char
+			} else if char == quoteChar {
+				// End of quoted string
+				inQuotes = false
+				quoteChar = 0
+			} else {
+				// Quote character inside different quotes
+				current.WriteRune(char)
+			}
+		case ' ', '\t', '\n':
+			if inQuotes {
+				// Space inside quotes, add to current argument
+				current.WriteRune(char)
+			} else {
+				// Space outside quotes, end current argument
+				if current.Len() > 0 {
+					args = append(args, current.String())
+					current.Reset()
+				}
+			}
+		default:
+			current.WriteRune(char)
+		}
+
+		// Handle end of string
+		if i == len(extraArgs)-1 && current.Len() > 0 {
+			args = append(args, current.String())
+		}
+	}
+
+	return args
 }
 
 func writeStepSummary(result string, exitCode int) error {
@@ -405,7 +484,11 @@ func generateSummaryMarkdown(result string, exitCode int) string {
 	summary.WriteString(fmt.Sprintf("| Model | `%s` |\n", config.Model))
 	summary.WriteString(fmt.Sprintf("| Base URL | `%s` |\n", config.BaseURL))
 	summary.WriteString(fmt.Sprintf("| Timeout | %d seconds |\n", config.Timeout))
-	summary.WriteString(fmt.Sprintf("| Working Directory | `%s` |\n\n", config.WorkingDir))
+	summary.WriteString(fmt.Sprintf("| Working Directory | `%s` |\n", config.WorkingDir))
+	if config.ExtraArgs != "" {
+		summary.WriteString(fmt.Sprintf("| Extra Arguments | `%s` |\n", config.ExtraArgs))
+	}
+	summary.WriteString("\n")
 
 	// Add prompt section
 	summary.WriteString("### � Input Prompt\n\n")

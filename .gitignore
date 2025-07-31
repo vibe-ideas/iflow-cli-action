@@ -39,5 +39,6 @@ tmp/
 # Log files
 *.log
 
-
+iflow-cli-action
 test_local.sh
+test_extra_args.sh
