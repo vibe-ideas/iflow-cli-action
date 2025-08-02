@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2025-08-02
+
 ### Added
 
 - **Extra Arguments Support**: New `extra_args` input parameter allows passing additional command-line arguments to iFlow CLI
@@ -14,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dynamic argument support for workflow inputs
 - Updated documentation with extra_args examples and use cases
 - New example workflow demonstrating extra_args functionality
+- iFlow CLI version display functionality
+- GitHub Actions workflow for iFlow with MCP (Model Context Protocol) support
 
 ### Changed
 
