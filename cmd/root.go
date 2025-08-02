@@ -127,6 +127,8 @@ func runIFlowAction() error {
 		setOutput("result", result)
 		setOutput("exit_code", fmt.Sprintf("%d", exitCode))
 
+		fmt.Println(result)
+
 		// Write to GitHub Actions step summary
 		if err := writeStepSummary(result, exitCode); err != nil {
 			info(fmt.Sprintf("Failed to write step summary: %v", err))
@@ -491,7 +493,7 @@ func generateSummaryMarkdown(result string, exitCode int) string {
 	summary.WriteString("\n")
 
 	// Add prompt section
-	summary.WriteString("### � Input Prompt\n\n")
+	summary.WriteString("### 📝 Input Prompt\n\n")
 	prompt := config.Prompt
 	if len(prompt) > 300 {
 		prompt = prompt[:300] + "..."
@@ -501,7 +503,7 @@ func generateSummaryMarkdown(result string, exitCode int) string {
 	summary.WriteString(fmt.Sprintf("> %s\n\n", prompt))
 
 	// Add result section with better formatting
-	summary.WriteString("### � Output\n\n")
+	summary.WriteString("### Output\n\n")
 	if exitCode == 0 {
 		displayResult := result
 		if len(result) > 3000 {

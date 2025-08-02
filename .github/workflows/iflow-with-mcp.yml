@@ -19,7 +19,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Generate homepage using iFlow CLI
+      - name: iFlow CLI with MCP
         uses: ./
         with:
           prompt: "use @deepwiki to search how to use Skynet to build a game"
