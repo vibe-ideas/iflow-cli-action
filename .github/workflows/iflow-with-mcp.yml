@@ -1,0 +1,38 @@
+name: iFlow with MCP
+
+on:
+  # Allow manual trigger
+  workflow_dispatch:
+  # Also run on pushes to main branch
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAGES: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate homepage using iFlow CLI
+        uses: ./
+        with:
+          prompt: "use @deepwiki to search how to use Skynet to build a game"
+          api_key: ${{ secrets.IFLOW_API_KEY }}
+          settings_json: |
+            {
+                "mcpServers": {
+                    "deepwiki": {
+                        "command": "npx",
+                        "args": ["-y", "mcp-deepwiki@latest"]
+                    }
+                }
+            }
+          model: "Qwen3-Coder"
+          timeout: "1800"
+          extra_args: "--debug"
