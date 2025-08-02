@@ -29,7 +29,7 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: 运行 iFlow CLI
-        uses: vibe-ideas/iflow-cli-action@v1.1.0
+        uses: vibe-ideas/iflow-cli-action@v1.2.0
         with:
           prompt: "分析此代码库并提出改进建议"
           api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -50,7 +50,7 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: 初始化项目分析
-        uses: vibe-ideas/iflow-cli-action@v1.1.0
+        uses: vibe-ideas/iflow-cli-action@v1.2.0
         with:
           prompt: "/init"
           api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -59,7 +59,7 @@ jobs:
           working_directory: "."
       
       - name: 生成技术文档
-        uses: vibe-ideas/iflow-cli-action@v1.1.0
+        uses: vibe-ideas/iflow-cli-action@v1.2.0
         with:
           prompt: "根据代码库分析生成技术文档"
           api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -86,7 +86,7 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: 项目概览
-        uses: vibe-ideas/iflow-cli-action@v1.1.0
+        uses: vibe-ideas/iflow-cli-action@v1.2.0
         with:
           prompt: |
             分析项目结构并提供：
@@ -97,7 +97,7 @@ jobs:
           timeout: "900"
       
       - name: 代码质量评估
-        uses: vibe-ideas/iflow-cli-action@v1.1.0
+        uses: vibe-ideas/iflow-cli-action@v1.2.0
         with:
           prompt: "审查代码以了解最佳实践、潜在错误和性能改进"
           api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -114,7 +114,7 @@ jobs:
 | `base_url` | iFlow API 的自定义基础 URL | ❌ 否 | `https://apis.iflow.cn/v1` |
 | `model` | 要使用的模型名称 | ❌ 否 | `Qwen3-Coder` |
 | `working_directory` | 运行 iFlow CLI 的工作目录 | ❌ 否 | `.` |
-| `timeout` | iFlow CLI 执行超时时间（秒） | ❌ 否 | `300` |
+| `timeout` | iFlow CLI 执行超时时间（秒） | ❌ 否 | `3600` |
 
 ## 输出参数
 
@@ -145,7 +145,7 @@ jobs:
 
 ```yaml
 - name: 自定义 iFlow 配置
-  uses: vibe-ideas/iflow-cli-action@v1.1.0
+  uses: vibe-ideas/iflow-cli-action@v1.2.0
   with:
     prompt: "使用自定义配置分析此代码库"
     api_key: ${{ secrets.IFLOW_API_KEY }}  # 仍需要用于基本验证
@@ -161,13 +161,62 @@ jobs:
       }
 ```
 
+## 使用 MCP 服务器
+
+[MCP (Model Context Protocol)](https://modelcontextprotocol.io) 允许 iFlow CLI 连接到外部工具和服务，扩展其超越 AI 模型交互的能力。您可以在工作流中配置 MCP 服务器，以启用代码搜索、数据库查询或自定义工具集成等功能。
+
+### 示例：使用 DeepWiki MCP 服务器
+
+以下示例演示了如何配置和使用 DeepWiki MCP 服务器以增强代码搜索功能：
+
+```yaml
+- name: 带 MCP 服务器的 iFlow CLI
+  uses: vibe-ideas/iflow-cli-action@v1.2.0
+  with:
+    prompt: "使用 @deepwiki 搜索如何使用 Skynet 构建游戏"
+    api_key: ${{ secrets.IFLOW_API_KEY }}
+    settings_json: |
+      {
+        "selectedAuthType": "iflow",
+        "apiKey": "${{ secrets.IFLOW_API_KEY }}",
+        "baseUrl": "https://apis.iflow.cn/v1",
+        "modelName": "Qwen3-Coder",
+        "searchApiKey": "${{ secrets.IFLOW_API_KEY }}",
+        "mcpServers": {
+          "deepwiki": {
+            "command": "npx",
+            "args": ["-y", "mcp-deepwiki@latest"]
+          }
+        }
+      }
+    model: "Qwen3-Coder"
+    timeout: "1800"
+    extra_args: "--debug"
+```
+
+在此示例中：
+
+- `mcpServers` 配置定义了一个名为 `deepwiki` 的服务器
+- 服务器通过 `npx -y mcp-deepwiki@latest` 执行
+- 提示中使用 `@deepwiki` 引用服务器以利用其功能
+- `searchApiKey` 用于 DeepWiki 服务的认证
+
+### 何时使用 MCP 服务器
+
+当您需要以下功能时，MCP 服务器特别有用：
+
+- 增强的代码搜索和文档查找功能
+- 与外部工具和服务的集成
+- 访问专业知识库或数据库
+- 扩展 iFlow CLI 功能的自定义工具
+
 ## 常见用例
 
 ### 代码分析和审查
 
 ```yaml
 - name: 代码审查
-  uses: vibe-ideas/iflow-cli-action@v1.1.0
+  uses: vibe-ideas/iflow-cli-action@v1.2.0
   with:
     prompt: "审查此拉取请求的代码质量、安全问题和最佳实践"
     api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -177,7 +226,7 @@ jobs:
 
 ```yaml
 - name: 生成文档
-  uses: vibe-ideas/iflow-cli-action@v1.1.0
+  uses: vibe-ideas/iflow-cli-action@v1.2.0
   with:
     prompt: "/init && 生成全面的 API 文档"
     api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -188,7 +237,7 @@ jobs:
 
 ```yaml
 - name: 测试策略
-  uses: vibe-ideas/iflow-cli-action@v1.1.0
+  uses: vibe-ideas/iflow-cli-action@v1.2.0
   with:
     prompt: "分析代码库并建议全面的测试策略和具体测试用例"
     api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -199,7 +248,7 @@ jobs:
 
 ```yaml
 - name: 架构审查
-  uses: vibe-ideas/iflow-cli-action@v1.1.0
+  uses: vibe-ideas/iflow-cli-action@v1.2.0
   with:
     prompt: "分析系统架构并提出可扩展性和可维护性的改进建议"
     api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -217,6 +266,7 @@ jobs:
 ### 常见问题
 
 **命令超时：** 为复杂操作增加 `timeout` 值
+
 ```yaml
 timeout: "900"  # 15 分钟
 ```
@@ -224,6 +274,7 @@ timeout: "900"  # 15 分钟
 **API 认证失败：** 验证您的 API 密钥是否正确设置在仓库 secrets 中
 
 **工作目录未找到：** 确保路径存在且使用了 checkout 操作
+
 ```yaml
 - uses: actions/checkout@v4  # 使用 iFlow 操作前必需
 ```
@@ -231,6 +282,7 @@ timeout: "900"  # 15 分钟
 ### 调试模式
 
 通过设置环境变量启用详细日志记录：
+
 ```yaml
 env:
   ACTIONS_STEP_DEBUG: true

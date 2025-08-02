@@ -200,6 +200,55 @@ When `settings_json` is provided, it takes precedence over individual configurat
 
 **Note:** The `api_key` input is still required for validation, but the actual API key used will be the one specified in your `settings_json`.
 
+## Using MCP Servers
+
+[MCP (Model Context Protocol)](https://modelcontextprotocol.io) allows iFlow CLI to connect to external tools and services, extending its capabilities beyond just AI model interactions. You can configure MCP servers in your workflow to enable features like code search, database querying, or custom tool integrations.
+
+### Example: Using DeepWiki MCP Server
+
+The following example demonstrates how to configure and use the DeepWiki MCP server for enhanced code search capabilities:
+
+```yaml
+- name: iFlow CLI with MCP Server
+  uses: vibe-ideas/iflow-cli-action@v1.2.0
+  with:
+    prompt: "use @deepwiki to search how to use Skynet to build a game"
+    api_key: ${{ secrets.IFLOW_API_KEY }}
+    settings_json: |
+      {
+        "selectedAuthType": "iflow",
+        "apiKey": "${{ secrets.IFLOW_API_KEY }}",
+        "baseUrl": "https://apis.iflow.cn/v1",
+        "modelName": "Qwen3-Coder",
+        "searchApiKey": "${{ secrets.IFLOW_API_KEY }}",
+        "mcpServers": {
+          "deepwiki": {
+            "command": "npx",
+            "args": ["-y", "mcp-deepwiki@latest"]
+          }
+        }
+      }
+    model: "Qwen3-Coder"
+    timeout: "1800"
+    extra_args: "--debug"
+```
+
+In this example:
+
+- The `mcpServers` configuration defines a server named `deepwiki`
+- The server is executed using `npx -y mcp-deepwiki@latest`
+- The prompt references the server with `@deepwiki` to utilize its capabilities
+- The `searchApiKey` is used for authentication with the DeepWiki service
+
+### When to Use MCP Servers
+
+MCP servers are particularly useful when you need:
+
+- Enhanced code search and documentation lookup capabilities
+- Integration with external tools and services
+- Access to specialized knowledge bases or databases
+- Custom tooling that extends the iFlow CLI functionality
+
 ## Common Use Cases
 
 ### Code Analysis and Review
