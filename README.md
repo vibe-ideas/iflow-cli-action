@@ -116,7 +116,7 @@ jobs:
 | `base_url` | Custom base URL for iFlow API | ❌ No | `https://apis.iflow.cn/v1` |
 | `model` | Model name to use | ❌ No | `Qwen3-Coder` |
 | `working_directory` | Working directory to run iFlow CLI from | ❌ No | `.` |
-| `timeout` | Timeout for iFlow CLI execution in seconds (1-3600) | ❌ No | `3600` |
+| `timeout` | Timeout for iFlow CLI execution in seconds (1-86400) | ❌ No | `86400` |
 | `extra_args` | Additional command line arguments to pass to iFlow CLI (space-separated string) | ❌ No | `` |
 
 ## Outputs

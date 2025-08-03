@@ -75,7 +75,7 @@ func init() {
 	rootCmd.Flags().StringVar(&config.BaseURL, "base-url", "https://apis.iflow.cn/v1", "Base URL for the iFlow API")
 	rootCmd.Flags().StringVar(&config.Model, "model", "Qwen3-Coder", "Model name to use")
 	rootCmd.Flags().StringVar(&config.WorkingDir, "working-directory", ".", "Working directory for execution")
-	rootCmd.Flags().IntVar(&config.Timeout, "timeout", 3600, "Timeout in seconds (1-3600)")
+	rootCmd.Flags().IntVar(&config.Timeout, "timeout", 3600, "Timeout in seconds (1-86400)")
 	rootCmd.Flags().StringVar(&config.ExtraArgs, "extra-args", "", "Additional command line arguments to pass to iFlow CLI")
 	rootCmd.Flags().BoolVar(&config.UseEnvVars, "use-env-vars", false, "Use environment variables for configuration (GitHub Actions mode)")
 
@@ -180,9 +180,9 @@ func LoadConfigFromEnv() error {
 		timeout, err := strconv.Atoi(timeoutStr)
 		if err != nil {
 			if config.UseEnvVars || isGitHubActions() {
-				setFailed(fmt.Sprintf("Invalid timeout value: '%s'. Timeout must be a valid integer between 1 and 3600 seconds.", timeoutStr))
+				setFailed(fmt.Sprintf("Invalid timeout value: '%s'. Timeout must be a valid integer between 1 and 86400 seconds.", timeoutStr))
 			}
-			return fmt.Errorf("invalid timeout value: '%s'. Timeout must be a valid integer between 1 and 3600 seconds", timeoutStr)
+			return fmt.Errorf("invalid timeout value: '%s'. Timeout must be a valid integer between 1 and 86400 seconds", timeoutStr)
 		}
 		config.Timeout = timeout
 		info(fmt.Sprintf("Timeout value set to: %d seconds", config.Timeout))
@@ -219,12 +219,12 @@ func validateConfig() error {
 		return fmt.Errorf("api-key is required when settings-json is not provided")
 	}
 
-	// Validate timeout range (1 second to 1 hour)
-	if config.Timeout < 1 || config.Timeout > 3600 {
+	// Validate timeout range (1 second to 24 hours)
+	if config.Timeout < 1 || config.Timeout > 86400 {
 		if config.UseEnvVars || isGitHubActions() {
-			setFailed(fmt.Sprintf("Timeout value %d is out of range. Timeout must be between 1 and 3600 seconds (1 hour).", config.Timeout))
+			setFailed(fmt.Sprintf("Timeout value %d is out of range. Timeout must be between 1 and 86400 seconds (24 hours).", config.Timeout))
 		}
-		return fmt.Errorf("timeout value %d is out of range. Timeout must be between 1 and 3600 seconds (1 hour)", config.Timeout)
+		return fmt.Errorf("timeout value %d is out of range. Timeout must be between 1 and 86400 seconds (24 hours)", config.Timeout)
 	}
 
 	return nil

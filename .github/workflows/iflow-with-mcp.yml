@@ -1,11 +1,15 @@
 name: iFlow with MCP
 
 on:
+  workflow_run:
+    workflows: ["Build and Deploy Homepage"]
+    types:
+      - completed
   # Allow manual trigger
   workflow_dispatch:
   # Also run on pushes to main branch
-  push:
-    branches: [ main ]
+  # push:
+  #   branches: [ main ]
 
 permissions:
   contents: read
@@ -39,5 +43,5 @@ jobs:
                 }
             }
           model: "Qwen3-Coder"
-          timeout: "1800"
+          timeout: "3600"
           extra_args: "--debug"

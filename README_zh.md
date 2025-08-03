@@ -114,7 +114,7 @@ jobs:
 | `base_url` | iFlow API 的自定义基础 URL | ❌ 否 | `https://apis.iflow.cn/v1` |
 | `model` | 要使用的模型名称 | ❌ 否 | `Qwen3-Coder` |
 | `working_directory` | 运行 iFlow CLI 的工作目录 | ❌ 否 | `.` |
-| `timeout` | iFlow CLI 执行超时时间（秒） | ❌ 否 | `3600` |
+| `timeout` | iFlow CLI 执行超时时间（秒） | ❌ 否 | `86400` |
 
 ## 输出参数
 
