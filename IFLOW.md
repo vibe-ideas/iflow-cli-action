@@ -24,6 +24,7 @@ This repository is a GitHub Action that wraps the iFlow CLI, enabling users to r
 ## Development Commands
 
 ### Building
+
 ```bash
 # Build the Go binary
 go build -o iflow-action .
@@ -33,6 +34,7 @@ docker build -t iflow-cli-action .
 ```
 
 ### Testing
+
 ```bash
 # Run Go tests (if any exist)
 go test ./...
@@ -42,6 +44,7 @@ act -j <job-name> -s IFLOW_API_KEY=<your-api-key>
 ```
 
 ### Running
+
 ```bash
 # Run with CLI flags
 ./iflow-action --prompt "Analyze this code" --api-key <key> --use-env-vars=false
@@ -86,6 +89,7 @@ INPUT_PROMPT="Analyze this code" INPUT_API_KEY=<key> ./iflow-action --use-env-va
 ## Testing Changes
 
 1. **Local Testing**:
+
    ```bash
    # Build and test with CLI flags
    go build -o iflow-action .
@@ -96,6 +100,7 @@ INPUT_PROMPT="Analyze this code" INPUT_API_KEY=<key> ./iflow-action --use-env-va
    ```
 
 2. **Docker Testing**:
+
    ```bash
    # Build Docker image
    docker build -t iflow-cli-action .
@@ -106,6 +111,7 @@ INPUT_PROMPT="Analyze this code" INPUT_API_KEY=<key> ./iflow-action --use-env-va
 
 3. **GitHub Actions Testing**:
    Use the `act` tool to test workflows locally:
+
    ```bash
    act -j job-name -s IFLOW_API_KEY=your-test-key
    ```
