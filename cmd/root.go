@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -371,7 +372,7 @@ func executeIFlow() (string, int, error) {
 
 	// Buffer to capture all output for GitHub summary
 	var outputBuffer strings.Builder
-	
+
 	// Create multi-writers to write to both console and buffer
 	stdoutWriter := io.MultiWriter(os.Stdout, &outputBuffer)
 	stderrWriter := io.MultiWriter(os.Stderr, &outputBuffer)
@@ -381,22 +382,31 @@ func executeIFlow() (string, int, error) {
 		return "", 1, fmt.Errorf("failed to start command: %w", err)
 	}
 
-	// Create channels for goroutines
+	// Use WaitGroup to ensure both goroutines complete
+	var wg sync.WaitGroup
+	// Create channels for goroutines to report errors
 	errorChan := make(chan error, 2)
 
 	// Start goroutines to stream output in real-time
+	wg.Add(2)
 	go func() {
+		defer wg.Done()
 		_, err := io.Copy(stdoutWriter, stdoutPipe)
 		errorChan <- err
 	}()
 
 	go func() {
+		defer wg.Done()
 		_, err := io.Copy(stderrWriter, stderrPipe)
 		errorChan <- err
 	}()
 
 	// Wait for command completion
 	err = cmd.Wait()
+
+	// Wait for both output streaming goroutines to complete
+	wg.Wait()
+	close(errorChan)
 
 	// Check for timeout first
 	if ctx.Err() == context.DeadlineExceeded {
@@ -405,15 +415,10 @@ func executeIFlow() (string, int, error) {
 	}
 
 	// Check for streaming errors (but don't fail if we got output)
-	for i := 0; i < 2; i++ {
-		select {
-		case streamErr := <-errorChan:
-			if streamErr != nil && streamErr != io.EOF {
-				// Log streaming errors but continue
-				fmt.Fprintf(os.Stderr, "Warning: output streaming error: %v\n", streamErr)
-			}
-		default:
-			// No error in channel
+	for streamErr := range errorChan {
+		if streamErr != nil && streamErr != io.EOF {
+			// Log streaming errors but continue
+			fmt.Fprintf(os.Stderr, "Warning: output streaming error: %v\n", streamErr)
 		}
 	}
 
