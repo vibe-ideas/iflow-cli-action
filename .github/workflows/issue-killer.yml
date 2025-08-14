@@ -1,0 +1,154 @@
+name: '🚀 iFlow CLI Issue Killer'
+
+on:
+  issue_comment:
+    types:
+      - 'created'
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: 'issue number to implement'
+        required: true
+        type: 'number'
+
+concurrency:
+  group: '${{ github.workflow }}-${{ github.event.issue.number }}'
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: 'bash'
+
+permissions:
+  contents: 'write'
+  id-token: 'write'
+  issues: 'write'
+  pull-requests: 'write'
+
+jobs:
+  implement-issue:
+    if: |-
+      github.event_name == 'workflow_dispatch' ||
+      (
+        github.event_name == 'issue_comment' &&
+        contains(github.event.comment.body, '/iflow-cli /implement') &&
+        contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association)
+      )
+    timeout-minutes: 30
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get Issue Details
+        id: get_issue
+        uses: 'actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea'
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issue_number = process.env.INPUT_ISSUE_NUMBER || context.issue.number;
+            core.setOutput('issue_number', issue_number);
+            
+            const issue = await github.rest.issues.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: parseInt(issue_number)
+            });
+            
+            core.setOutput('issue_title', issue.data.title);
+            core.setOutput('issue_body', issue.data.body);
+            
+            // Parse implementation request from comment or use issue body
+            let implementation_request = issue.data.body;
+            if (context.eventName === 'issue_comment') {
+              implementation_request = context.payload.comment.body.replace('/iflow-cli /implement', '').trim();
+              if (implementation_request === '') {
+                implementation_request = issue.data.body;
+              }
+            }
+            
+            core.setOutput('implementation_request', implementation_request);
+
+      - name: 'Run iFlow CLI Implementation'
+        uses: ./
+        id: 'iflow_cli_implementation'
+        env:
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+          ISSUE_TITLE: '${{ steps.get_issue.outputs.issue_title }}'
+          ISSUE_BODY: '${{ steps.get_issue.outputs.issue_body }}'
+          ISSUE_NUMBER: '${{ steps.get_issue.outputs.issue_number }}'
+          REPOSITORY: '${{ github.repository }}'
+        with:
+          api_key: ${{ secrets.IFLOW_API_KEY }}
+          timeout: "1800"
+          extra_args: "--debug"
+          settings_json: |
+            {
+                "selectedAuthType": "iflow",
+                "apiKey": "${{ secrets.IFLOW_API_KEY }}",
+                "baseUrl": "https://apis.iflow.cn/v1",
+                "modelName": "Qwen3-Coder",
+                "searchApiKey": "${{ secrets.IFLOW_API_KEY }}",
+                "mcpServers": {
+                  "github": {
+                  "command": "github-mcp-server",
+                  "args": [
+                    "stdio"
+                  ],
+                  "includeTools": [
+                    "create_pull_request",
+                    "list_pull_requests"
+                  ],
+                    "env": {
+                      "GITHUB_PERSONAL_ACCESS_TOKEN": "${{ secrets.GITHUB_TOKEN }}"
+                    }
+                  }
+                }
+            }
+          prompt: |
+            ## Role
+
+            You are an implementation assistant. Your task is to implement a feature
+            based on the GitHub issue provided. Follow these steps:
+
+            1. Analyze the issue title and body provided in the environment
+               variables: "${ISSUE_TITLE}" and "${ISSUE_BODY}".
+            2. If the comment that triggered this action contains additional
+               implementation instructions, use those as well.
+            3. Implement the requested feature by creating or modifying files as
+               needed.
+            4. Ensure all changes are complete and correct according to the issue
+               requirements.
+            5. Do not add comments or modify the issue content.
+            6. Focus only on implementing the current issue.
+
+            ## Guidelines
+
+            - Make all necessary code changes to implement the feature
+            - Ensure new code follows existing project conventions
+            - Add or modify tests if applicable
+            - Reference all shell variables as "${VAR}" (with quotes and braces)
+            
+            ## Creating Pull Request
+            
+            Once you have implemented the feature, create a pull request using the GitHub MCP tool:
+            1. Use the mcp__github__create_pull_request to create a Pull Request.
+            2. The PR should be created from a new branch with a descriptive name
+            3. The PR title should be descriptive and reference the issue number
+            4. The PR body should explain what was implemented and reference the issue
+
+      - name: 'Post Implementation Failure Comment'
+        if: |-
+          ${{ failure() && steps.iflow_cli_implementation.outcome == 'failure' }}
+        uses: 'actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea'
+        with:
+          github-token: '${{ secrets.GITHUB_TOKEN }}'
+          script: |-
+            github.rest.issues.createComment({
+              owner: '${{ github.repository }}'.split('/')[0],
+              repo: '${{ github.repository }}'.split('/')[1],
+              issue_number: '${{ steps.get_issue.outputs.issue_number }}',
+              body: 'There is a problem with the iFlow CLI issue implementation. Please check the [action logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.'
+            })
