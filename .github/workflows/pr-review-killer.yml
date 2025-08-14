@@ -39,7 +39,8 @@ jobs:
         id: extract
         run: |
           COMMENT="${{ github.event.comment.body }}"
-          INSTRUCTIONS=$(echo "$COMMENT" | sed -n 's/.*@iflow-cli \/review-killer \(.*\)/\1/p' | xargs)
+          # Extract everything after "@iflow-cli /review-killer "
+          INSTRUCTIONS=$(echo "$COMMENT" | sed -n 's/.*@iflow-cli[[:space:]]*\/review-killer[[:space:]]*\(.*\)/\1/p' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
           echo "instructions=$INSTRUCTIONS" >> $GITHUB_OUTPUT
           
           # Get PR details
