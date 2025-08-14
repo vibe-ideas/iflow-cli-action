@@ -99,7 +99,8 @@ jobs:
                   ],
                   "includeTools": [
                     "create_pull_request",
-                    "list_pull_requests"
+                    "list_pull_requests",
+                    "create_issue_comment"
                   ],
                     "env": {
                       "GITHUB_PERSONAL_ACCESS_TOKEN": "${{ secrets.GITHUB_TOKEN }}"
@@ -134,10 +135,23 @@ jobs:
             ## Creating Pull Request
             
             Once you have implemented the feature, create a pull request using the GitHub MCP tool:
-            1. Use the mcp__github__create_pull_request to create a Pull Request.
+            1. Use the create_pull_request to create a Pull Request.
             2. The PR should be created from a new branch with a descriptive name
             3. The PR title should be descriptive and reference the issue number
             4. The PR body should explain what was implemented and reference the issue
+            
+            ## Creating Completion Comment
+            
+            After successfully implementing the feature and creating the PR, add a completion comment to the issue using the GitHub MCP tool:
+            1. Use the add_issue_comment to add a comment to issue #${ISSUE_NUMBER}
+            2. The comment should include:
+               - ✅ Confirmation that the issue has been implemented
+               - 🎉 Brief summary of what was accomplished
+               - 📋 List of key changes made
+               - 🔗 Link to the created Pull Request (if successful)
+               - 📝 If PR creation failed, provide a manual PR creation link like: https://github.com/${REPOSITORY}/compare/main...feature/issue-${ISSUE_NUMBER}
+               - 🤖 Note that this is an automated implementation
+            3. Use a friendly tone and include appropriate emojis for better user experience
 
       - name: 'Post Implementation Failure Comment'
         if: |-
