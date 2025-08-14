@@ -7,6 +7,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Install runtime dependencies including Node.js
 RUN apt-get update && \
     apt-get install -y \
+        wget \
         bash \
         curl \
         git \
