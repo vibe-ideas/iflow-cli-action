@@ -58,7 +58,16 @@ jobs:
           ) ||
           github.event_name == 'pull_request_review_comment'
         ) &&
-        contains(github.event.comment.body, '@iflow-cli /review') &&
+        (
+          contains(github.event.comment.body, '@iflow-cli /review ') ||
+          contains(github.event.comment.body, '@iFlow-CLI /review ') ||
+          contains(github.event.comment.body, '@IFLOW-CLI /review ') ||
+          contains(github.event.comment.body, '@IFlow-CLI /review ') ||
+          endsWith(github.event.comment.body, '@iflow-cli /review') ||
+          endsWith(github.event.comment.body, '@iFlow-CLI /review') ||
+          endsWith(github.event.comment.body, '@IFLOW-CLI /review') ||
+          endsWith(github.event.comment.body, '@IFlow-CLI /review')
+        ) &&
         (
           github.event.repository.private == true ||
           contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association)
@@ -66,7 +75,16 @@ jobs:
       ) ||
       (
         github.event_name == 'pull_request_review' &&
-        contains(github.event.review.body, '@iflow-cli /review') &&
+        (
+          contains(github.event.review.body, '@iflow-cli /review ') ||
+          contains(github.event.review.body, '@iFlow-CLI /review ') ||
+          contains(github.event.review.body, '@IFLOW-CLI /review ') ||
+          contains(github.event.review.body, '@IFlow-CLI /review ') ||
+          endsWith(github.event.review.body, '@iflow-cli /review') ||
+          endsWith(github.event.review.body, '@iFlow-CLI /review') ||
+          endsWith(github.event.review.body, '@IFLOW-CLI /review') ||
+          endsWith(github.event.review.body, '@IFlow-CLI /review')
+        ) &&
         (
           github.event.repository.private == true ||
           contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.review.author_association)
@@ -124,10 +142,11 @@ jobs:
 
           echo "pr_number=${PR_NUMBER}" >> "${GITHUB_OUTPUT}"
 
-          # Extract additional instructions from comment
-          ADDITIONAL_INSTRUCTIONS="$(
-            echo "${COMMENT_BODY}" | sed 's/.*@iflow-cli \/review//' | xargs
-          )"
+          # Extract additional instructions from comment (case insensitive, exact match for /review)
+          ADDITIONAL_INSTRUCTIONS=""
+          if echo "${COMMENT_BODY}" | grep -qiE '@iflow-cli[[:space:]]+/review([[:space:]]|$)'; then
+            ADDITIONAL_INSTRUCTIONS="$(echo "${COMMENT_BODY}" | sed -E 's/.*@[iI][fF][lL][oO][wW]-[cC][lL][iI][[:space:]]+\/[rR][eE][vV][iI][eE][wW][[:space:]]*(.*)/\1/' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+          fi
           echo "additional_instructions=${ADDITIONAL_INSTRUCTIONS}" >> "${GITHUB_OUTPUT}"
 
           # Get PR details
