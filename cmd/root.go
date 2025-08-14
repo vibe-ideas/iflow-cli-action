@@ -4,11 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -357,12 +359,67 @@ func executeIFlow() (string, int, error) {
 
 	cmd := exec.CommandContext(ctx, "iflow", args...)
 
-	output, err := cmd.CombinedOutput()
+	// Create pipes for real-time output streaming
+	stdoutPipe, err := cmd.StdoutPipe()
+	if err != nil {
+		return "", 1, fmt.Errorf("failed to create stdout pipe: %w", err)
+	}
 
-	// Check for timeout first, regardless of error type
+	stderrPipe, err := cmd.StderrPipe()
+	if err != nil {
+		return "", 1, fmt.Errorf("failed to create stderr pipe: %w", err)
+	}
+
+	// Buffer to capture all output for GitHub summary
+	var outputBuffer strings.Builder
+
+	// Create multi-writers to write to both console and buffer
+	stdoutWriter := io.MultiWriter(os.Stdout, &outputBuffer)
+	stderrWriter := io.MultiWriter(os.Stderr, &outputBuffer)
+
+	// Start the command
+	if err := cmd.Start(); err != nil {
+		return "", 1, fmt.Errorf("failed to start command: %w", err)
+	}
+
+	// Use WaitGroup to ensure both goroutines complete
+	var wg sync.WaitGroup
+	// Create channels for goroutines to report errors
+	errorChan := make(chan error, 2)
+
+	// Start goroutines to stream output in real-time
+	wg.Add(2)
+	go func() {
+		defer wg.Done()
+		_, err := io.Copy(stdoutWriter, stdoutPipe)
+		errorChan <- err
+	}()
+
+	go func() {
+		defer wg.Done()
+		_, err := io.Copy(stderrWriter, stderrPipe)
+		errorChan <- err
+	}()
+
+	// Wait for command completion
+	err = cmd.Wait()
+
+	// Wait for both output streaming goroutines to complete
+	wg.Wait()
+	close(errorChan)
+
+	// Check for timeout first
 	if ctx.Err() == context.DeadlineExceeded {
 		config.IsTimeout = true
-		return string(output), 124, fmt.Errorf("command timed out after %d seconds", config.Timeout)
+		return outputBuffer.String(), 124, fmt.Errorf("command timed out after %d seconds", config.Timeout)
+	}
+
+	// Check for streaming errors (but don't fail if we got output)
+	for streamErr := range errorChan {
+		if streamErr != nil && streamErr != io.EOF {
+			// Log streaming errors but continue
+			fmt.Fprintf(os.Stderr, "Warning: output streaming error: %v\n", streamErr)
+		}
 	}
 
 	exitCode := 0
@@ -371,11 +428,11 @@ func executeIFlow() (string, int, error) {
 			exitCode = exitError.ExitCode()
 		} else {
 			// Non-exit error (e.g., command not found)
-			return string(output), 1, err
+			return outputBuffer.String(), 1, err
 		}
 	}
 
-	return string(output), exitCode, nil
+	return outputBuffer.String(), exitCode, nil
 }
 
 // parseExtraArgs parses a space-separated string of arguments into a slice
