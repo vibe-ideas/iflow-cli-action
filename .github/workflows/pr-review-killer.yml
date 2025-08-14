@@ -24,7 +24,12 @@ jobs:
     if: |-
       github.event_name == 'issue_comment' &&
       github.event.issue.pull_request &&
-      startsWith(github.event.comment.body, '@iflow-cli /review-killer') &&
+      (
+        contains(github.event.comment.body, '@iflow-cli /review-killer') ||
+        contains(github.event.comment.body, '@iFlow-CLI /review-killer') ||
+        contains(github.event.comment.body, '@IFLOW-CLI /review-killer') ||
+        contains(github.event.comment.body, '@IFlow-CLI /review-killer')
+      ) &&
       contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association)
     timeout-minutes: 30
     runs-on: 'ubuntu-latest'
@@ -39,8 +44,13 @@ jobs:
         id: extract
         run: |
           COMMENT="${{ github.event.comment.body }}"
-          # Extract everything after "@iflow-cli /review-killer "
-          INSTRUCTIONS=$(echo "$COMMENT" | sed -n 's/.*@iflow-cli[[:space:]]*\/review-killer[[:space:]]*\(.*\)/\1/p' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+          # Extract everything after "@iflow-cli /review-killer " (case insensitive)
+          # First check if the pattern exists, then extract
+          if echo "$COMMENT" | grep -qiE '@iflow-cli[[:space:]]+/review-killer'; then
+            INSTRUCTIONS=$(echo "$COMMENT" | sed -E 's/.*@[iI][fF][lL][oO][wW]-[cC][lL][iI][[:space:]]+\/[rR][eE][vV][iI][eE][wW]-[kK][iI][lL][lL][eE][rR][[:space:]]*(.*)/\1/' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+          else
+            INSTRUCTIONS=""
+          fi
           echo "instructions=$INSTRUCTIONS" >> $GITHUB_OUTPUT
           
           # Get PR details
