@@ -1,14 +1,22 @@
-# Use Node.js 22 as base for runtime with latest Node.js pre-installed
-FROM node:22-slim AS runtime-base
+# Use Ubuntu 22.04 as base image
+FROM ubuntu:22.04 AS runtime-base
 
-# Install runtime dependencies
+# Set noninteractive installation mode to avoid prompts
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install runtime dependencies including Node.js
 RUN apt-get update && \
     apt-get install -y \
         bash \
         curl \
         git \
         procps \
-        ca-certificates && \
+        ca-certificates \
+        software-properties-common && \
+    # Install Node.js 22
+    curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
+    apt-get install -y nodejs && \
+    # Clean up
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -20,6 +28,10 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | d
     apt-get install -y gh && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+# Install Go for github-mcp-server
+RUN curl -fsSL https://go.dev/dl/go1.24.4.linux-amd64.tar.gz | tar -C /usr/local -xz
+ENV PATH="$PATH:/usr/local/go/bin"
 
 # https://www.npmjs.com/package/@iflow-ai/iflow-cli
 # Pre-install iFlow CLI using npm package
@@ -50,7 +62,7 @@ COPY cmd/ ./cmd/
 # Build the application
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o iflow-action .
 
-# Final stage - copy Go binary to Node.js runtime
+# Final stage - copy Go binary to Ubuntu runtime
 FROM runtime-base
 
 # Create a non-root user with proper home directory
