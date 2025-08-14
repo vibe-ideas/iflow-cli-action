@@ -31,14 +31,14 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | d
 
 # Install Go for github-mcp-server
 RUN curl -fsSL https://go.dev/dl/go1.24.4.linux-amd64.tar.gz | tar -C /usr/local -xz
-ENV PATH="$PATH:/usr/local/go/bin"
+ENV PATH="/usr/local/go/bin:$PATH"
 
 # https://www.npmjs.com/package/@iflow-ai/iflow-cli
 # Pre-install iFlow CLI using npm package
 RUN npm install -g @iflow-ai/iflow-cli
 
 # Install github-mcp-server CLI tool
-RUN go install github.com/github/github-mcp-server/cmd/github-mcp-server@latest
+RUN /usr/local/go/bin/go install github.com/github/github-mcp-server/cmd/github-mcp-server@latest
 
 # Use official Go 1.24.4 image for building
 FROM golang:1.24.4-bullseye AS builder
@@ -81,6 +81,9 @@ RUN chmod +x /usr/local/bin/iflow-action
 # Create .iflow directory for the non-root user and set permissions
 RUN mkdir -p /home/iflow/.iflow && \
     chown -R iflow:iflow /home/iflow/.iflow
+
+# Ensure Go is in PATH for the runtime user
+ENV PATH="/usr/local/go/bin:$PATH"
 
 # Switch to non-root user
 USER iflow
