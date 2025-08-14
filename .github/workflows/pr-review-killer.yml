@@ -43,7 +43,7 @@ jobs:
           echo "instructions=$INSTRUCTIONS" >> $GITHUB_OUTPUT
           
           # Get PR details
-          PR_NUMBER=$(echo "${{ github.event.issue.pull_request.url }}" | grep -oE '[0-9]+)
+          PR_NUMBER=$(echo "${{ github.event.issue.pull_request.url }}" | grep -oE '[0-9]+$')
           echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
 
       - name: 'Run iFlow CLI Implementation'
