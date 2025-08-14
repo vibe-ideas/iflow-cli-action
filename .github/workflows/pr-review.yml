@@ -153,7 +153,36 @@ jobs:
           ADDITIONAL_INSTRUCTIONS: '${{ steps.get_pr.outputs.additional_instructions || steps.get_pr_comment.outputs.additional_instructions }}'
           REPOSITORY: '${{ github.repository }}'
         with:
-          api_key: ${{ secrets.IFLOW_API_KEY }} 
+          api_key: ${{ secrets.IFLOW_API_KEY }}
+          settings_json: |
+            {
+                "selectedAuthType": "iflow",
+                "apiKey": "${{ secrets.IFLOW_API_KEY }}",
+                "baseUrl": "https://apis.iflow.cn/v1",
+                "modelName": "Qwen3-Coder",
+                "searchApiKey": "${{ secrets.IFLOW_API_KEY }}",
+                "mcpServers": {
+                  "github": {
+                    "command": "docker",
+                    "args": [
+                      "run",
+                      "-i",
+                      "--rm",
+                      "-e",
+                      "GITHUB_PERSONAL_ACCESS_TOKEN",
+                      "ghcr.io/github/github-mcp-server"
+                    ],
+                    "includeTools": [
+                      "create_pending_pull_request_review",
+                      "add_comment_to_pending_review",
+                      "submit_pending_pull_request_review"
+                    ],
+                    "env": {
+                      "GITHUB_PERSONAL_ACCESS_TOKEN": "${{ secrets.GITHUB_TOKEN }}"
+                    }
+                  }
+                }
+            }
           prompt: |
             ## Role
 
