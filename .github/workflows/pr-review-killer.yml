@@ -1,0 +1,113 @@
+name: '🚀 iFlow CLI PR Review Killer'
+
+on:
+  issue_comment:
+    types:
+      - 'created'
+
+concurrency:
+  group: '${{ github.workflow }}-${{ github.event.issue.number }}'
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: 'bash'
+
+permissions:
+  contents: 'write'
+  id-token: 'write'
+  issues: 'write'
+  pull-requests: 'write'
+
+jobs:
+  modify-code:
+    if: |-
+      github.event_name == 'issue_comment' &&
+      github.event.issue.pull_request &&
+      startsWith(github.event.comment.body, '@iflow-cli /review-killer') &&
+      contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association)
+    timeout-minutes: 30
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ github.event.issue.pull_request.head.sha }}
+
+      - name: Extract instructions
+        id: extract
+        run: |
+          COMMENT="${{ github.event.comment.body }}"
+          INSTRUCTIONS=$(echo "$COMMENT" | sed -n 's/.*@iflow-cli \/review-killer \(.*\)/\1/p' | xargs)
+          echo "instructions=$INSTRUCTIONS" >> $GITHUB_OUTPUT
+          
+          # Get PR details
+          PR_NUMBER=$(echo "${{ github.event.issue.pull_request.url }}" | grep -oE '[0-9]+)
+          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+
+      - name: 'Run iFlow CLI Implementation'
+        uses: ./
+        id: 'iflow_cli_implementation'
+        with:
+          api_key: ${{ secrets.IFLOW_API_KEY }}
+          timeout: "1800"
+          extra_args: "--debug"
+          settings_json: |
+            {
+                "selectedAuthType": "iflow",
+                "apiKey": "${{ secrets.IFLOW_API_KEY }}",
+                "baseUrl": "https://apis.iflow.cn/v1",
+                "modelName": "Qwen3-Coder",
+                "searchApiKey": "${{ secrets.IFLOW_API_KEY }}",
+                "mcpServers": {
+                  "github": {
+                  "command": "github-mcp-server",
+                  "args": [
+                    "stdio"
+                  ],
+                  "includeTools": [
+                    "add_issue_comment"
+                  ],
+                    "env": {
+                      "GITHUB_PERSONAL_ACCESS_TOKEN": "${{ secrets.GITHUB_TOKEN }}"
+                    }
+                  }
+                }
+            }
+          prompt: |
+            ## Role
+
+            You are a PR review assistant. Your task is to modify code based on
+            review comments. Follow these steps:
+
+            1. Analyze the PR review comment provided in the environment
+               variables.
+            2. Extract the modification instructions from the comment: "${{ steps.extract.outputs.instructions }}"
+            3. Implement the requested changes by creating or modifying files as
+               needed.
+            4. Ensure all changes are complete and correct according to the review
+               requirements.
+            5. Focus only on implementing the current review comment.
+
+            ## Guidelines
+
+            - Make all necessary code changes to address the review comment
+            - Ensure new code follows existing project conventions
+            - Add or modify tests if applicable
+            - Reference all shell variables as "${VAR}" (with quotes and braces)
+            
+            ## Committing Changes
+            
+            After implementing the changes:
+            1. Stage all modified files
+            2. Commit the changes with a descriptive message
+            3. Push the changes to the current branch
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add .
+          git commit -m "Apply code modifications from PR review comment" || exit 0
+          git push
