@@ -154,6 +154,8 @@ jobs:
           REPOSITORY: '${{ github.repository }}'
         with:
           api_key: ${{ secrets.IFLOW_API_KEY }}
+          timeout: "3600"
+          extra_args: "--debug"
           settings_json: |
             {
                 "selectedAuthType": "iflow",

@@ -9,6 +9,9 @@ on:
   # Also run on pushes to main branch
   push:
     branches: [ main ]
+    paths:
+      - 'README.md'
+      - 'README_zh.md'
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
