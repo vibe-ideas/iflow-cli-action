@@ -25,6 +25,9 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | d
 # Pre-install iFlow CLI using npm package
 RUN npm install -g @iflow-ai/iflow-cli
 
+# Install github-mcp-server CLI tool
+RUN go install github.com/github/github-mcp-server/cmd/github-mcp-server@latest
+
 # Use official Go 1.24.4 image for building
 FROM golang:1.24.4-bullseye AS builder
 
