@@ -358,3 +358,4 @@ env:
 - [iFlow CLI](https://github.com/iflow-ai/iflow-cli) - 底层 CLI 工具
 - [iFlow 平台](https://docs.iflow.cn/en/docs) - 官方文档
 - [GitHub Actions 文档](https://docs.github.com/en/actions)
+- [Gemini CLI GitHub Action](https://github.com/google-github-actions/run-gemini-cli)
