@@ -5,20 +5,39 @@ FROM ubuntu:22.04 AS runtime-base
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install runtime dependencies including Node.js
-RUN apt-get update && \
-    apt-get install -y \
+RUN apt-get update -y && apt-get -y upgrade \
+    && apt-get install -y \
         wget \
         bash \
         curl \
         git \
         procps \
         ca-certificates \
-        software-properties-common && \
-    # Install Node.js 22
-    curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
-    apt-get install -y nodejs && \
-    # Clean up
-    apt-get clean && \
+        software-properties-common \
+        build-essential \
+        libssl-dev \
+        pkg-config \
+        libtool \
+        autoconf \
+        libreadline-dev \
+        cmake \
+        libev-dev \
+        python3 \
+        unzip \
+        lsb-core \
+        iproute2 \
+        iputils-ping \
+        netcat-traditional \
+        apt-transport-https \
+        gnupg \
+        lsb-release \
+        file \
+        vim \
+        zlib1g-dev \
+    && add-apt-repository ppa:xmake-io/xmake \
+    && apt-get update -y \
+    && apt install xmake linux-tools-generic google-perftools libgoogle-perftools-dev -y \
+    && apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Install GitHub CLI (gh)
