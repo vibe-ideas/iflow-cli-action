@@ -1,4 +1,4 @@
-name: build ci image and push image to ghcr.io
+name: Build ci image and push image to ghcr.io
 
 on:
   workflow_dispatch:

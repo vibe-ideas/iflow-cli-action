@@ -7,7 +7,7 @@ on:
   pull_request:
 
 jobs:
-  test-hrp:
+  unit-test:
     strategy:
       matrix:
         go-version:
