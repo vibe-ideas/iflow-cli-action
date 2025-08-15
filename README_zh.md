@@ -115,6 +115,7 @@ jobs:
 | `model` | 要使用的模型名称 | ❌ 否 | `Qwen3-Coder` |
 | `working_directory` | 运行 iFlow CLI 的工作目录 | ❌ 否 | `.` |
 | `timeout` | iFlow CLI 执行超时时间（秒） | ❌ 否 | `86400` |
+| `extra_args` | 传递给 iFlow CLI 的附加命令行参数（以空格分隔的字符串） | ❌ 否 | `` |
 
 ## 输出参数
 
@@ -159,6 +160,31 @@ jobs:
         "searchApiKey": "${{ secrets.SEARCH_API_KEY }}",
         "customField": "customValue"
       }
+```
+
+## 使用附加参数
+
+`extra_args` 输入允许您直接将附加命令行参数传递给 iFlow CLI。这提供了灵活性，可以使用未作为专用操作输入公开的高级 iFlow CLI 功能。
+
+```yaml
+- name: 带自定义参数的 iFlow
+  uses: vibe-ideas/iflow-cli-action@v1.2.0
+  with:
+    prompt: "使用调试输出分析此代码库"
+    api_key: ${{ secrets.IFLOW_API_KEY }}
+    extra_args: "--debug --max-tokens 3000"
+```
+
+### 附加参数示例
+
+- `--debug` - 启用调试模式
+
+### 带引号的参数
+
+对于包含空格的参数，请使用引号：
+
+```yaml
+extra_args: '--debug'
 ```
 
 ## 使用 MCP 服务器
@@ -255,11 +281,182 @@ jobs:
     timeout: "900"
 ```
 
+### 使用附加参数
+
+```yaml
+- name: 带调试输出的分析
+  uses: vibe-ideas/iflow-cli-action@v1.2.0
+  with:
+    prompt: "分析此代码库并提供见解"
+    api_key: ${{ secrets.IFLOW_API_KEY }}
+    extra_args: "--debug"
+```
+
+### 安全分析
+
+```yaml
+- name: 安全扫描
+  uses: vibe-ideas/iflow-cli-action@v1.2.0
+  with:
+    prompt: "分析此代码库的安全漏洞并提供改进建议"
+    api_key: ${{ secrets.IFLOW_API_KEY }}
+    model: "DeepSeek-V3"
+    timeout: "900"
+```
+
+### 多步骤分析
+
+```yaml
+- name: 项目概览
+  uses: vibe-ideas/iflow-cli-action@v1.2.0
+  with:
+    prompt: "/init"
+    api_key: ${{ secrets.IFLOW_API_KEY }}
+  id: init
+
+- name: 架构分析
+  uses: vibe-ideas/iflow-cli-action@v1.2.0
+  with:
+    prompt: "基于项目分析，提供详细的架构建议"
+    api_key: ${{ secrets.IFLOW_API_KEY }}
+    model: "Qwen3-Coder"
+  id: arch
+
+- name: 性能审查
+  uses: vibe-ideas/iflow-cli-action@v1.2.0
+  with:
+    prompt: "分析代码的性能瓶颈和优化机会"
+    api_key: ${{ secrets.IFLOW_API_KEY }}
+    model: "DeepSeek-V3"
+  id: perf
+```
+
 ## 要求
 
 - **运行器**：基于 Linux 的 GitHub Actions 运行器（推荐 ubuntu-latest）
 - **权限**：操作需要互联网访问权限以下载依赖项
 - **资源**：足够的命令执行超时时间（根据复杂性调整）
+
+## 工作流示例
+
+以下是一些实际的工作流示例，展示如何在不同场景中使用 iFlow CLI Action。
+
+### 拉取请求代码审查
+
+```yaml
+name: 使用 iFlow CLI 进行代码审查
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  iflow-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+      
+      - name: 使用 iFlow CLI 审查代码
+        uses: vibe-ideas/iflow-cli-action@v1
+        with:
+          prompt: "审查此拉取请求的代码质量、安全问题和最佳实践。提供具体的改进建议。"
+          api_key: ${{ secrets.IFLOW_API_KEY }}
+          model: "Qwen3-Coder"
+          timeout: "600"
+        id: review
+      
+      - name: 在 PR 中评论
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '## 🤖 iFlow CLI 代码审查\n\n' + '${{ steps.review.outputs.result }}'
+            })
+```
+
+### 生成文档
+
+```yaml
+name: 生成文档
+on:
+  push:
+    branches: [main]
+    paths: ['**.go', '**.js', '**.py', '**.java', '**.ts']
+
+jobs:
+  generate-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+      
+      - name: 初始化项目分析
+        uses: vibe-ideas/iflow-cli-action@v1
+        with:
+          prompt: "/init"
+          api_key: ${{ secrets.IFLOW_API_KEY }}
+          timeout: "300"
+      
+      - name: 生成文档
+        uses: vibe-ideas/iflow-cli-action@v1
+        with:
+          prompt: "根据代码库分析生成全面的技术文档，包括 API 文档、架构概述和使用示例。"
+          api_key: ${{ secrets.IFLOW_API_KEY }}
+          model: "Qwen3-Coder"
+          timeout: "600"
+        id: docs
+      
+      - name: 创建文档文件
+        run: |
+          mkdir -p docs
+          echo "${{ steps.docs.outputs.result }}" > docs/TECHNICAL_DOCS.md
+      
+      - name: 提交文档
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "docs: 自动生成技术文档"
+          file_pattern: docs/TECHNICAL_DOCS.md
+```
+
+### 使用附加参数
+
+```yaml
+# 示例：在 iFlow CLI Action 中使用附加参数
+name: 带附加参数的 iFlow
+
+on:
+  workflow_dispatch:
+
+jobs:
+  # 示例 1：基本附加参数
+  basic_extra_args:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: 使用详细输出运行
+        uses: vibe-ideas/iflow-cli-action@v1
+        with:
+          prompt: "分析此代码库"
+          api_key: ${{ secrets.IFLOW_API_KEY }}
+          extra_args: "--debug"
+
+  # 示例 2：多个标志
+  multiple_flags:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: 使用多个自定义标志运行
+        uses: vibe-ideas/iflow-cli-action@v1
+        with:
+          prompt: "为主要函数生成单元测试"
+          api_key: ${{ secrets.IFLOW_API_KEY }}
+          extra_args: "--debug --checkpointing"
+```
 
 ## 故障排除
 
@@ -287,6 +484,7 @@ timeout: "900"  # 15 分钟
 env:
   ACTIONS_STEP_DEBUG: true
 ```
+
 
 ## 贡献
 
