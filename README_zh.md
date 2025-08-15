@@ -143,6 +143,23 @@ jobs:
 
 ## 自定义配置
 
+### 使用附加参数
+
+`extra_args` 输入允许您直接向 iFlow CLI 传递附加的命令行参数。这提供了灵活性，可以使用未作为专用操作输入公开的高级 iFlow CLI 功能。
+
+```yaml
+- name: 带自定义参数的 iFlow
+  uses: vibe-ideas/iflow-cli-action@v1.2.0
+  with:
+    prompt: "使用调试输出分析此代码库"
+    api_key: ${{ secrets.IFLOW_API_KEY }}
+    extra_args: "--debug --max-tokens 3000"
+```
+
+#### 附加参数示例
+
+- `--debug` - 启用 iFLOW CLI 调试模式
+
 ### 使用预执行命令
 
 `precmd` 输入允许您在执行 iFlow CLI 之前运行 Shell 命令。这对于设置环境或安装 iFlow 命令所需的依赖项非常有用。
@@ -158,7 +175,7 @@ jobs:
       git fetch origin main
 ```
 
-### 多行命令
+#### 多行命令
 
 您可以通过用换行符分隔来指定多个命令：
 
@@ -168,7 +185,17 @@ precmd: |
   npm run build
 ```
 
-### 自定义 iFlow 配置
+#### 带引号的参数
+
+对于包含空格的参数，请使用引号：
+
+```yaml
+extra_args: '--debug'
+```
+
+### 使用自定义设置
+
+对于需要完全控制 iFlow 配置的高级用户，您可以直接提供自定义的 `settings.json`：
 
 ```yaml
 - name: 自定义 iFlow 配置
@@ -187,6 +214,15 @@ precmd: |
         "customField": "customValue"
       }
 ```
+
+当提供 `settings_json` 时，它优先于单个配置输入（`base_url`、`model` 等）。这允许您：
+
+- 使用自定义认证类型
+- 配置输入中不可用的附加字段
+- 在多个工作流运行中维护复杂配置
+- 支持自定义 API 端点和模型
+
+**注意：** 仍需要 `api_key` 输入进行验证，但实际使用的 API 密钥将是您在 `settings_json` 中指定的密钥。
 
 ## 使用 MCP 服务器
 
@@ -237,58 +273,52 @@ precmd: |
 - 访问专业知识库或数据库
 - 扩展 iFlow CLI 功能的自定义工具
 
-## 常见用例
+## Common Use Cases
 
-### 代码分析和审查
+### Code Analysis and Review
 
 ```yaml
-- name: 代码审查
+- name: Code Review
   uses: vibe-ideas/iflow-cli-action@v1.2.0
   with:
-    prompt: "审查此拉取请求的代码质量、安全问题和最佳实践"
+    prompt: "Review this pull request for code quality, security issues, and best practices"
     api_key: ${{ secrets.IFLOW_API_KEY }}
 ```
 
-### 文档生成
+### Documentation Generation
 
 ```yaml
-- name: 生成文档
+- name: Generate Documentation
   uses: vibe-ideas/iflow-cli-action@v1.2.0
   with:
-    prompt: "/init && 生成全面的 API 文档"
+    prompt: "/init && Generate comprehensive API documentation"
     api_key: ${{ secrets.IFLOW_API_KEY }}
     timeout: "600"
 ```
 
-### 自动化测试建议
+### Automated Testing Suggestions
 
 ```yaml
-- name: 测试策略
+- name: Test Strategy
   uses: vibe-ideas/iflow-cli-action@v1.2.0
   with:
-    prompt: "分析代码库并建议全面的测试策略和具体测试用例"
+    prompt: "Analyze the codebase and suggest a comprehensive testing strategy with specific test cases"
     api_key: ${{ secrets.IFLOW_API_KEY }}
     model: "DeepSeek-V3"
 ```
 
-### 架构分析
+### Architecture Analysis
 
 ```yaml
-- name: 架构审查
+- name: Architecture Review
   uses: vibe-ideas/iflow-cli-action@v1.2.0
   with:
-    prompt: "分析系统架构并提出可扩展性和可维护性的改进建议"
+    prompt: "Analyze the system architecture and suggest improvements for scalability and maintainability"
     api_key: ${{ secrets.IFLOW_API_KEY }}
     timeout: "900"
 ```
 
-## 要求
-
-- **运行器**：基于 Linux 的 GitHub Actions 运行器（推荐 ubuntu-latest）
-- **权限**：操作需要互联网访问权限以下载依赖项
-- **资源**：足够的命令执行超时时间（根据复杂性调整）
-
-## 故障排除
+## Troubleshooting
 
 ### 常见问题
 

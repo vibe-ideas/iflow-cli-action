@@ -160,7 +160,7 @@ The `extra_args` input allows you to pass additional command-line arguments dire
 
 #### Examples of Extra Arguments
 
-- `--debug` - Enable debug mode  
+- `--debug` - Enable iFLOW CLI debug mode  
 
 ### Using Pre-Execution Commands
 
@@ -264,7 +264,6 @@ In this example:
 - The `mcpServers` configuration defines a server named `deepwiki`
 - The server is executed using `npx -y mcp-deepwiki@latest`
 - The prompt references the server with `@deepwiki` to utilize its capabilities
-- The `searchApiKey` is used for authentication with the DeepWiki service
 
 ### When to Use MCP Servers
 
@@ -320,12 +319,6 @@ MCP servers are particularly useful when you need:
     timeout: "900"
 ```
 
-## Requirements
-
-- **Runner**: Linux-based GitHub Actions runners (ubuntu-latest recommended)
-- **Permissions**: Actions need internet access to download dependencies
-- **Resources**: Sufficient timeout for command execution (adjust based on complexity)
-
 ## Troubleshooting
 
 ### Common Issues
@@ -339,10 +332,6 @@ timeout: "900"  # 15 minutes
 **API authentication failed:** Verify your API key is correctly set in repository secrets
 
 **Working directory not found:** Ensure the path exists and checkout action is used
-
-```yaml
-- uses: actions/checkout@v4  # Required before using iFlow action
-```
 
 ### Debug Mode
 
@@ -366,3 +355,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [iFlow CLI](https://github.com/iflow-ai/iflow-cli) - The underlying CLI tool
 - [iFlow Platform](https://docs.iflow.cn/en/docs) - Official documentation
 - [GitHub Actions Documentation](https://docs.github.com/en/actions)
+- [Gemini CLI GitHub Action](https://github.com/google-github-actions/run-gemini-cli)
