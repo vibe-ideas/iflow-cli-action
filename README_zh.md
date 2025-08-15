@@ -255,6 +255,100 @@ jobs:
     timeout: "900"
 ```
 
+### 使用 MCP 服务器
+
+```yaml
+- name: 带 MCP 服务器的 iFlow CLI
+  uses: vibe-ideas/iflow-cli-action@v1.2.0
+  with:
+    prompt: "使用 @deepwiki 搜索如何使用 Skynet 构建游戏"
+    api_key: ${{ secrets.IFLOW_API_KEY }}
+    settings_json: |
+      {
+        "selectedAuthType": "iflow",
+        "apiKey": "${{ secrets.IFLOW_API_KEY }}",
+        "baseUrl": "https://apis.iflow.cn/v1",
+        "modelName": "Qwen3-Coder",
+        "searchApiKey": "${{ secrets.IFLOW_API_KEY }}",
+        "mcpServers": {
+          "deepwiki": {
+            "command": "npx",
+            "args": ["-y", "mcp-deepwiki@latest"]
+          }
+        }
+      }
+    model: "Qwen3-Coder"
+    timeout: "1800"
+    extra_args: "--debug"
+```
+
+### 使用额外参数
+
+```yaml
+- name: 带自定义参数的 iFlow
+  uses: vibe-ideas/iflow-cli-action@v1.2.0
+  with:
+    prompt: "使用调试输出分析此代码库"
+    api_key: ${{ secrets.IFLOW_API_KEY }}
+    extra_args: "--debug --max-tokens 3000"
+```
+
+### 使用自定义设置
+
+```yaml
+- name: 自定义 iFlow 配置
+  uses: vibe-ideas/iflow-cli-action@v1.2.0
+  with:
+    prompt: "使用自定义配置分析此代码库"
+    api_key: ${{ secrets.IFLOW_API_KEY }}  # 仍需要用于基本验证
+    settings_json: |
+      {
+        "theme": "Dark",
+        "selectedAuthType": "iflow",
+        "apiKey": "${{ secrets.IFLOW_API_KEY }}",
+        "baseUrl": "https://custom-api.example.com/v1",
+        "modelName": "custom-model",
+        "searchApiKey": "${{ secrets.SEARCH_API_KEY }}",
+        "customField": "customValue"
+      }
+```
+
+### 完整工作流示例
+
+```yaml
+name: iFlow CLI 代码审查
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  iflow-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+      
+      - name: 使用 iFlow CLI 审查代码
+        uses: vibe-ideas/iflow-cli-action@v1.2.0
+        with:
+          prompt: "审查此拉取请求的代码质量、安全问题和最佳实践。提供具体的改进建议。"
+          api_key: ${{ secrets.IFLOW_API_KEY }}
+          model: "Qwen3-Coder"
+          timeout: "600"
+        id: review
+      
+      - name: 在 PR 中评论
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '## 🤖 iFlow CLI 代码审查\n\n' + '${{ steps.review.outputs.result }}'
+            })
+```
+
 ## 要求
 
 - **运行器**：基于 Linux 的 GitHub Actions 运行器（推荐 ubuntu-latest）

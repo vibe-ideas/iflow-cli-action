@@ -294,6 +294,100 @@ MCP servers are particularly useful when you need:
     timeout: "900"
 ```
 
+### Using MCP Servers
+
+```yaml
+- name: iFlow CLI with MCP Server
+  uses: vibe-ideas/iflow-cli-action@v1.2.0
+  with:
+    prompt: "use @deepwiki to search how to use Skynet to build a game"
+    api_key: ${{ secrets.IFLOW_API_KEY }}
+    settings_json: |
+      {
+        "selectedAuthType": "iflow",
+        "apiKey": "${{ secrets.IFLOW_API_KEY }}",
+        "baseUrl": "https://apis.iflow.cn/v1",
+        "modelName": "Qwen3-Coder",
+        "searchApiKey": "${{ secrets.IFLOW_API_KEY }}",
+        "mcpServers": {
+          "deepwiki": {
+            "command": "npx",
+            "args": ["-y", "mcp-deepwiki@latest"]
+          }
+        }
+      }
+    model: "Qwen3-Coder"
+    timeout: "1800"
+    extra_args: "--debug"
+```
+
+### Using Extra Arguments
+
+```yaml
+- name: iFlow with Custom Arguments
+  uses: vibe-ideas/iflow-cli-action@v1.2.0
+  with:
+    prompt: "Analyze this codebase with debug output"
+    api_key: ${{ secrets.IFLOW_API_KEY }}
+    extra_args: "--debug --max-tokens 3000"
+```
+
+### Using Custom Settings
+
+```yaml
+- name: Custom iFlow Configuration
+  uses: vibe-ideas/iflow-cli-action@v1.2.0
+  with:
+    prompt: "Analyze this codebase with custom configuration"
+    api_key: ${{ secrets.IFLOW_API_KEY }}  # Still required for basic validation
+    settings_json: |
+      {
+        "theme": "Dark",
+        "selectedAuthType": "iflow",
+        "apiKey": "${{ secrets.IFLOW_API_KEY }}",
+        "baseUrl": "https://custom-api.example.com/v1",
+        "modelName": "custom-model",
+        "searchApiKey": "${{ secrets.SEARCH_API_KEY }}",
+        "customField": "customValue"
+      }
+```
+
+### Complete Workflow Example
+
+```yaml
+name: iFlow CLI Code Review
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  iflow-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Review code with iFlow CLI
+        uses: vibe-ideas/iflow-cli-action@v1.2.0
+        with:
+          prompt: "Review this pull request for code quality, security issues, and best practices. Provide specific suggestions for improvement."
+          api_key: ${{ secrets.IFLOW_API_KEY }}
+          model: "Qwen3-Coder"
+          timeout: "600"
+        id: review
+      
+      - name: Comment on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '## 🤖 iFlow CLI Code Review\n\n' + '${{ steps.review.outputs.result }}'
+            })
+```
+
 ## Requirements
 
 - **Runner**: Linux-based GitHub Actions runners (ubuntu-latest recommended)
