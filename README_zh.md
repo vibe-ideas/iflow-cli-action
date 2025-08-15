@@ -273,7 +273,45 @@ extra_args: '--debug'
 - 访问专业知识库或数据库
 - 扩展 iFlow CLI 功能的自定义工具
 
-## Common Use Cases
+## 示例工作流程
+
+该仓库包含多个示例工作流程，展示了 iFlow CLI GitHub Action 的各种用例。您可以在 [.github/workflows](.github/workflows) 目录中找到这些示例。
+
+### 定时生成主页
+
+[deploy-homepage.yml](.github/workflows/deploy-homepage.yml) 工作流程演示了如何使用 iFlow CLI 自动从您的 README 生成 Reveal.js 演示文稿，并按计划部署到 GitHub Pages。
+
+主要特性：
+- 每天 UTC 时间 02:00 运行，或在主分支的 README 更改时运行
+- 使用 iFlow CLI 将 README.md 转换为 Reveal.js 演示文稿
+- 将生成的演示文稿部署到 GitHub Pages
+
+### 使用 MCP 服务器
+
+[iflow-with-mcp.yml](.github/workflows/iflow-with-mcp.yml) 工作流程展示了如何使用 iFlow CLI 与 MCP (Model Context Protocol) 服务器集成以扩展功能。
+
+主要特性：
+- 演示与 DeepWiki MCP 服务器的集成
+- 展示如何在提示中使用 `@deepwiki` 来访问增强的搜索功能
+- 使用自定义 settings_json 配置 MCP 服务器
+
+### 自动化问题实现
+
+[issue-killer.yml](.github/workflows/issue-killer.yml) 工作流程通过使用 iFlow CLI 和 GitHub MCP 集成来实现自动化问题处理。
+
+主要特性：
+- 通过在问题上评论 `@iflow-cli /issue-killer` 触发
+- 自动生成实现计划和进度更新
+- 使用 GitHub MCP 工具创建拉取请求和添加评论
+- 直接根据问题描述实现功能
+
+### 拉取请求审查自动化
+
+该仓库包含多个用于 PR 审查自动化的流程：
+- [pr-review.yml](.github/workflows/pr-review.yml) - 带有详细反馈的自动化 PR 审查
+- [pr-review-killer.yml](.github/workflows/pr-review-killer.yml) - 基于审查评论的 PR 修改
+
+### Common Use Cases
 
 ### Code Analysis and Review
 
