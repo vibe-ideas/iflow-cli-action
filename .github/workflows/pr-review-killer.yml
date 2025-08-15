@@ -41,7 +41,7 @@ jobs:
           fetch-depth: 0
 
       - name: Checkout PR branch
-        uses: xt0rted/pull-request-comment-branch@main
+        uses: xt0rted/pull-request-comment-branch@v3.0.0
         id: checkout_pr
         
       - name: Extract instructions from comment
