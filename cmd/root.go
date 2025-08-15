@@ -26,6 +26,7 @@ type Config struct {
 	WorkingDir   string
 	Timeout      int
 	ExtraArgs    string // Additional command line arguments for iFlow CLI
+	PreCmd       string // Shell command(s) to execute before running iFlow CLI
 	UseEnvVars   bool   // Flag to indicate whether to use environment variables (GitHub Actions mode)
 	IsTimeout    bool   // Flag to indicate if execution timed out
 }
@@ -79,6 +80,7 @@ func init() {
 	rootCmd.Flags().StringVar(&config.WorkingDir, "working-directory", ".", "Working directory for execution")
 	rootCmd.Flags().IntVar(&config.Timeout, "timeout", 3600, "Timeout in seconds (1-86400)")
 	rootCmd.Flags().StringVar(&config.ExtraArgs, "extra-args", "", "Additional command line arguments to pass to iFlow CLI")
+	rootCmd.Flags().StringVar(&config.PreCmd, "precmd", "", "Shell command(s) to execute before running iFlow CLI")
 	rootCmd.Flags().BoolVar(&config.UseEnvVars, "use-env-vars", false, "Use environment variables for configuration (GitHub Actions mode)")
 
 	// Mark required flags only if not in GitHub Actions mode - this will be validated later
@@ -114,6 +116,14 @@ func runIFlowAction() error {
 	info("Configuring iFlow settings...")
 	if err := configureIFlow(); err != nil {
 		return fmt.Errorf("failed to configure iFlow: %w", err)
+	}
+
+	// Execute pre-command if specified
+	if config.PreCmd != "" {
+		info(fmt.Sprintf("Executing pre-command: %s", config.PreCmd))
+		if err := executePreCmd(); err != nil {
+			return fmt.Errorf("failed to execute pre-command: %w", err)
+		}
 	}
 
 	// Execute iFlow CLI command with --prompt and --yolo flags
@@ -193,6 +203,11 @@ func LoadConfigFromEnv() error {
 	if extraArgs := getInput("extra_args"); extraArgs != "" {
 		config.ExtraArgs = strings.TrimSpace(extraArgs)
 		info(fmt.Sprintf("Extra arguments set to: '%s'", config.ExtraArgs))
+	}
+
+	if preCmd := getInput("precmd"); preCmd != "" {
+		config.PreCmd = strings.TrimSpace(preCmd)
+		info(fmt.Sprintf("Pre-command set to: '%s'", config.PreCmd))
 	}
 
 	return nil
@@ -339,6 +354,39 @@ func configureIFlow() error {
 	}
 
 	info(fmt.Sprintf("iFlow settings configured at %s", settingsFile))
+	return nil
+}
+
+func executePreCmd() error {
+	// Split the precmd into lines and execute each line
+	commands := strings.Split(config.PreCmd, "\n")
+	
+	for _, command := range commands {
+		// Skip empty lines
+		command = strings.TrimSpace(command)
+		if command == "" {
+			continue
+		}
+		
+		info(fmt.Sprintf("Executing pre-command: %s", command))
+		
+		// Create a command to execute the pre-command
+		cmd := exec.Command("sh", "-c", command)
+		
+		// Set the working directory for the command
+		cmd.Dir = config.WorkingDir
+		
+		// Connect the command's stdin, stdout, and stderr to the current process
+		cmd.Stdin = os.Stdin
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		
+		// Execute the command and wait for it to complete
+		if err := cmd.Run(); err != nil {
+			return fmt.Errorf("pre-command failed: %w", err)
+		}
+	}
+	
 	return nil
 }
 

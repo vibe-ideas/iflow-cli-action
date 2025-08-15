@@ -38,9 +38,6 @@ docker build -t iflow-cli-action .
 ```bash
 # Run Go tests (if any exist)
 go test ./...
-
-# Test the action locally with act (GitHub Actions runner)
-act -j <job-name> -s IFLOW_API_KEY=<your-api-key>
 ```
 
 ### Running
@@ -97,6 +94,9 @@ INPUT_PROMPT="Analyze this code" INPUT_API_KEY=<key> ./iflow-action --use-env-va
    
    # Test with environment variables
    INPUT_PROMPT="Test prompt" INPUT_API_KEY=test-key ./iflow-action --use-env-vars=true
+   
+   # Test with precmd
+   INPUT_PROMPT="Test prompt" INPUT_API_KEY=test-key INPUT_PRECMD="echo 'Running pre-command'" ./iflow-action --use-env-vars=true
    ```
 
 2. **Docker Testing**:
@@ -107,11 +107,7 @@ INPUT_PROMPT="Analyze this code" INPUT_API_KEY=<key> ./iflow-action --use-env-va
    
    # Run with environment variables
    docker run -e INPUT_PROMPT="Test prompt" -e INPUT_API_KEY=test-key iflow-cli-action
-   ```
-
-3. **GitHub Actions Testing**:
-   Use the `act` tool to test workflows locally:
-
-   ```bash
-   act -j job-name -s IFLOW_API_KEY=your-test-key
+   
+   # Run with precmd
+   docker run -e INPUT_PROMPT="Test prompt" -e INPUT_API_KEY=test-key -e INPUT_PRECMD="echo 'Running pre-command'" iflow-cli-action
    ```

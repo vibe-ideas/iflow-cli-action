@@ -35,6 +35,10 @@ inputs:
     description: 'Additional command line arguments to pass to iFlow CLI (space-separated string)'
     required: false
     default: ''
+  precmd:
+    description: 'Shell command(s) to execute before running iFlow CLI (e.g., "npm install", "git fetch")'
+    required: false
+    default: ''
 
 outputs:
   result:
