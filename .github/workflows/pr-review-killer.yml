@@ -40,7 +40,11 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
-      - name: Extract instructions and PR details
+      - name: Checkout PR branch
+        uses: xt0rted/pull-request-comment-branch@main
+        id: checkout_pr
+        
+      - name: Extract instructions from comment
         id: extract
         run: |
           COMMENT="${{ github.event.comment.body }}"
@@ -52,25 +56,6 @@ jobs:
             INSTRUCTIONS=""
           fi
           echo "instructions=$INSTRUCTIONS" >> $GITHUB_OUTPUT
-          
-          # Get PR details
-          PR_NUMBER=$(echo "${{ github.event.issue.pull_request.url }}" | grep -oE '[0-9]+$')
-          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
-
-      - name: Get PR branch information
-        id: get_pr
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # Get PR branch information using GitHub CLI
-          PR_DATA="$(gh pr view "$PR_NUMBER" --json headRefName,headRepositoryOwner)"
-          HEAD_REF=$(echo "$PR_DATA" | jq -r '.headRefName')
-          echo "head_ref=$HEAD_REF" >> $GITHUB_OUTPUT
-
-      - name: Checkout PR branch
-        run: |
-          git fetch origin pull/${{ steps.extract.outputs.pr_number }}/head:${{ steps.get_pr.outputs.head_ref }}
-          git checkout ${{ steps.get_pr.outputs.head_ref }}
 
       - name: 'Run iFlow CLI Implementation'
         uses: ./
@@ -128,7 +113,7 @@ jobs:
             After implementing the changes:
             1. Stage all modified files
             2. Commit the changes with a descriptive message
-            3. Push the changes to the ${{ steps.get_pr.outputs.head_ref }} branch
+            3. Push the changes to the ${{ steps.checkout_pr.outputs.head_ref }} branch
 
       - name: Commit and push changes
         run: |
@@ -136,4 +121,4 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add .
           git commit -m "Apply code modifications from PR review comment" || exit 0
-          git push origin ${{ steps.get_pr.outputs.head_ref }}
+          git push origin ${{ steps.checkout_pr.outputs.head_ref }}
