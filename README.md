@@ -118,6 +118,7 @@ jobs:
 | `working_directory` | Working directory to run iFlow CLI from | ❌ No | `.` |
 | `timeout` | Timeout for iFlow CLI execution in seconds (1-86400) | ❌ No | `86400` |
 | `extra_args` | Additional command line arguments to pass to iFlow CLI (space-separated string) | ❌ No | `` |
+| `precmd` | Shell command(s) to execute before running iFlow CLI (e.g., "npm install", "git fetch") | ❌ No | `` |
 
 ## Outputs
 
@@ -160,6 +161,31 @@ The `extra_args` input allows you to pass additional command-line arguments dire
 #### Examples of Extra Arguments
 
 - `--debug` - Enable debug mode  
+
+### Using Pre-Execution Commands
+
+The `precmd` input allows you to run shell commands before executing the iFlow CLI. This is useful for setting up the environment or installing dependencies needed for your iFlow commands.
+
+```yaml
+- name: iFlow with Pre-Execution Commands
+  uses: vibe-ideas/iflow-cli-action@v1.2.0
+  with:
+    prompt: "Analyze this codebase after installing dependencies"
+    api_key: ${{ secrets.IFLOW_API_KEY }}
+    precmd: |
+      npm install
+      git fetch origin main
+```
+
+#### Multi-line Commands
+
+You can specify multiple commands by separating them with newlines:
+
+```yaml
+precmd: |
+  npm ci
+  npm run build
+```
 
 #### Quoted Arguments
 

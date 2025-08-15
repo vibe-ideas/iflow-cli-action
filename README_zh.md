@@ -115,6 +115,8 @@ jobs:
 | `model` | 要使用的模型名称 | ❌ 否 | `Qwen3-Coder` |
 | `working_directory` | 运行 iFlow CLI 的工作目录 | ❌ 否 | `.` |
 | `timeout` | iFlow CLI 执行超时时间（秒） | ❌ 否 | `86400` |
+| `extra_args` | 传递给 iFlow CLI 的附加命令行参数（空格分隔的字符串） | ❌ 否 | `` |
+| `precmd` | 在运行 iFlow CLI 之前执行的 Shell 命令（例如 "npm install", "git fetch"） | ❌ 否 | `` |
 
 ## 输出参数
 
@@ -140,6 +142,31 @@ jobs:
 - 支持通过 OpenAI 兼容 API 的自定义模型
 
 ## 自定义配置
+
+### 使用预执行命令
+
+`precmd` 输入允许您在执行 iFlow CLI 之前运行 Shell 命令。这对于设置环境或安装 iFlow 命令所需的依赖项非常有用。
+
+```yaml
+- name: 带预执行命令的 iFlow
+  uses: vibe-ideas/iflow-cli-action@v1.2.0
+  with:
+    prompt: "在安装依赖项后分析此代码库"
+    api_key: ${{ secrets.IFLOW_API_KEY }}
+    precmd: |
+      npm install
+      git fetch origin main
+```
+
+### 多行命令
+
+您可以通过用换行符分隔来指定多个命令：
+
+```yaml
+precmd: |
+  npm ci
+  npm run build
+```
 
 ### 自定义 iFlow 配置
 
