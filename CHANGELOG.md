@@ -7,29 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2025-08-16
+
 ### Added
 
-- **Real-time Output Streaming**: Implemented real-time output streaming for iFlow CLI execution, providing immediate feedback during long-running operations
-- **MCP Server Support**: Added support for Model Context Protocol (MCP) servers, enabling integration with external tools and services
-- **GitHub CLI Installation**: Added GitHub CLI (gh) to the Docker image for enhanced GitHub integration capabilities
-- **Enhanced Timeout Support**: Extended timeout configuration to allow up to 24 hours (86400 seconds) for long-running operations
-- **Go Runtime Environment**: Added Go installation to Docker image to support github-mcp-server and other Go-based tools
-- **wget Dependency**: Added wget to Dockerfile dependencies for improved compatibility
+- **Pre-execution Commands Support**: New `precmd` input parameter allows running shell commands before executing iFlow CLI, useful for setting up environment or installing dependencies
+- **Multi-line Command Support**: Enhanced `precmd` to support multiple shell commands separated by newlines
+- **Enhanced Documentation**: Comprehensive documentation and examples for using `precmd` and `extra_args` features
+- **Gemini CLI Action Reference**: Added reference to Gemini CLI GitHub Action in documentation
 
 ### Changed
 
-- **Docker Base Image**: Switched Docker base image from node:22-slim to ubuntu:22.04 for better stability and compatibility
-- **Improved Docker Configuration**: Enhanced Go installation and environment configuration in Dockerfile
-- **Enhanced GitHub Actions Workflows**: Added automated issue triage, PR review automation, and issue killer workflows
-- **Updated GitHub Actions Integration**: Improved GitHub Actions step summaries with better formatting and more detailed information
-- **Enhanced Error Handling**: Improved error handling and reporting in GitHub Actions workflows
-
-### Fixed
-
-- **Command Streaming Issues**: Fixed issues with output streaming and buffering during iFlow CLI execution
-- **Go Runtime Availability**: Ensured Go command is properly available in the runtime environment
-- **Regex Pattern Matching**: Corrected regex for extracting PR numbers in workflow scripts
-- **Comment Parsing**: Improved comment parsing for review-killer scripts
+- **Improved Examples**: Enhanced example workflows with better security controls and trust verification
+- **Workflow Naming**: Renamed workflows for better clarity and organization
+- **Documentation Updates**: Updated README files with detailed information about new features and usage patterns
+- **PR Review Workflow**: Enhanced pull request review workflow with improved security checks and trust verification
 
 ## [1.2.0] - 2025-08-02
 

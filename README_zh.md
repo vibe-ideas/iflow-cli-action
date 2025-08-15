@@ -29,7 +29,7 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: 运行 iFlow CLI
-        uses: vibe-ideas/iflow-cli-action@v1.2.0
+        uses: vibe-ideas/iflow-cli-action@v1.3.0
         with:
           prompt: "分析此代码库并提出改进建议"
           api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -50,7 +50,7 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: 初始化项目分析
-        uses: vibe-ideas/iflow-cli-action@v1.2.0
+        uses: vibe-ideas/iflow-cli-action@v1.3.0
         with:
           prompt: "/init"
           api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -59,7 +59,7 @@ jobs:
           working_directory: "."
       
       - name: 生成技术文档
-        uses: vibe-ideas/iflow-cli-action@v1.2.0
+        uses: vibe-ideas/iflow-cli-action@v1.3.0
         with:
           prompt: "根据代码库分析生成技术文档"
           api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -86,7 +86,7 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: 项目概览
-        uses: vibe-ideas/iflow-cli-action@v1.2.0
+        uses: vibe-ideas/iflow-cli-action@v1.3.0
         with:
           prompt: |
             分析项目结构并提供：
@@ -97,7 +97,7 @@ jobs:
           timeout: "900"
       
       - name: 代码质量评估
-        uses: vibe-ideas/iflow-cli-action@v1.2.0
+        uses: vibe-ideas/iflow-cli-action@v1.3.0
         with:
           prompt: "审查代码以了解最佳实践、潜在错误和性能改进"
           api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -149,7 +149,7 @@ jobs:
 
 ```yaml
 - name: 带自定义参数的 iFlow
-  uses: vibe-ideas/iflow-cli-action@v1.2.0
+  uses: vibe-ideas/iflow-cli-action@v1.3.0
   with:
     prompt: "使用调试输出分析此代码库"
     api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -166,7 +166,7 @@ jobs:
 
 ```yaml
 - name: 带预执行命令的 iFlow
-  uses: vibe-ideas/iflow-cli-action@v1.2.0
+  uses: vibe-ideas/iflow-cli-action@v1.3.0
   with:
     prompt: "在安装依赖项后分析此代码库"
     api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -199,7 +199,7 @@ extra_args: '--debug'
 
 ```yaml
 - name: 自定义 iFlow 配置
-  uses: vibe-ideas/iflow-cli-action@v1.2.0
+  uses: vibe-ideas/iflow-cli-action@v1.3.0
   with:
     prompt: "使用自定义配置分析此代码库"
     api_key: ${{ secrets.IFLOW_API_KEY }}  # 仍需要用于基本验证
@@ -234,7 +234,7 @@ extra_args: '--debug'
 
 ```yaml
 - name: 带 MCP 服务器的 iFlow CLI
-  uses: vibe-ideas/iflow-cli-action@v1.2.0
+  uses: vibe-ideas/iflow-cli-action@v1.3.0
   with:
     prompt: "使用 @deepwiki 搜索如何使用 Skynet 构建游戏"
     api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -279,7 +279,7 @@ extra_args: '--debug'
 
 ```yaml
 - name: Code Review
-  uses: vibe-ideas/iflow-cli-action@v1.2.0
+  uses: vibe-ideas/iflow-cli-action@v1.3.0
   with:
     prompt: "Review this pull request for code quality, security issues, and best practices"
     api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -289,7 +289,7 @@ extra_args: '--debug'
 
 ```yaml
 - name: Generate Documentation
-  uses: vibe-ideas/iflow-cli-action@v1.2.0
+  uses: vibe-ideas/iflow-cli-action@v1.3.0
   with:
     prompt: "/init && Generate comprehensive API documentation"
     api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -300,7 +300,7 @@ extra_args: '--debug'
 
 ```yaml
 - name: Test Strategy
-  uses: vibe-ideas/iflow-cli-action@v1.2.0
+  uses: vibe-ideas/iflow-cli-action@v1.3.0
   with:
     prompt: "Analyze the codebase and suggest a comprehensive testing strategy with specific test cases"
     api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -311,7 +311,7 @@ extra_args: '--debug'
 
 ```yaml
 - name: Architecture Review
-  uses: vibe-ideas/iflow-cli-action@v1.2.0
+  uses: vibe-ideas/iflow-cli-action@v1.3.0
   with:
     prompt: "Analyze the system architecture and suggest improvements for scalability and maintainability"
     api_key: ${{ secrets.IFLOW_API_KEY }}
