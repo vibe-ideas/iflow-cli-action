@@ -115,10 +115,14 @@ jobs:
             2. Commit the changes with a descriptive message
             3. Push the changes to the ${{ steps.checkout_pr.outputs.head_ref }} branch
 
-      - name: Commit and push changes
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add .
-          git commit -m "Apply code modifications from PR review comment" || exit 0
-          git push origin ${{ steps.checkout_pr.outputs.head_ref }}
+            **NEVER commit directly to the `main` branch.**
+            **NEVER force push**
+
+
+      # - name: Commit and push changes
+      #   run: |
+      #     git config --global user.name 'github-actions[bot]'
+      #     git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+      #     git add .
+      #     git commit -m "Apply code modifications from PR review comment" || exit 0
+      #     git push origin ${{ steps.checkout_pr.outputs.head_ref }}
