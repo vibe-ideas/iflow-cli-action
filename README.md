@@ -274,7 +274,45 @@ MCP servers are particularly useful when you need:
 - Access to specialized knowledge bases or databases
 - Custom tooling that extends the iFlow CLI functionality
 
-## Common Use Cases
+## Example Workflows
+
+This repository includes several example workflows that demonstrate various use cases of the iFlow CLI GitHub Action. You can find these in the [.github/workflows](.github/workflows) directory.
+
+### Scheduled Homepage Generation
+
+The [deploy-homepage.yml](.github/workflows/deploy-homepage.yml) workflow demonstrates how to use iFlow CLI to automatically generate a Reveal.js presentation from your README and deploy it to GitHub Pages on a schedule.
+
+Key features:
+- Runs daily at 02:00 UTC or on pushes to main branch when README changes
+- Uses iFlow CLI to convert README.md to a Reveal.js presentation
+- Deploys the generated presentation to GitHub Pages
+
+### Using MCP Servers
+
+The [iflow-with-mcp.yml](.github/workflows/iflow-with-mcp.yml) workflow shows how to use iFlow CLI with MCP (Model Context Protocol) servers to extend capabilities.
+
+Key features:
+- Demonstrates integration with DeepWiki MCP server
+- Shows how to use `@deepwiki` in prompts to access enhanced search capabilities
+- Uses custom settings_json to configure MCP servers
+
+### Automated Issue Implementation
+
+The [issue-killer.yml](.github/workflows/issue-killer.yml) workflow enables automated issue implementation using iFlow CLI with GitHub MCP integration.
+
+Key features:
+- Triggered by commenting `@iflow-cli /issue-killer` on an issue
+- Automatically creates implementation plan and progress updates
+- Uses GitHub MCP tools to create pull requests and add comments
+- Implements features directly based on issue descriptions
+
+### Pull Request Review Automation
+
+The repository includes multiple workflows for PR review automation:
+- [pr-review.yml](.github/workflows/pr-review.yml) - Automated PR review with detailed feedback
+- [pr-review-killer.yml](.github/workflows/pr-review-killer.yml) - PR modification based on review comments
+
+### Common Use Cases
 
 ### Code Analysis and Review
 
