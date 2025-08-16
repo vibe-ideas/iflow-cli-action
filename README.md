@@ -112,7 +112,7 @@ jobs:
 |-------|-------------|----------|---------|
 | `prompt` | The prompt to execute with iFlow CLI | ✅ Yes | - |
 | `api_key` | iFlow API key for authentication | ✅ Yes | - |
-| `settings_json` | Complete iFlow settings.json content (JSON string). If provided, this will override other configuration options. | ❌ No | - |
+| `settings_json` | Complete `~/.iflow/settings.json` content (JSON string). If provided, this will override other configuration options. | ❌ No | - |
 | `base_url` | Custom base URL for iFlow API | ❌ No | `https://apis.iflow.cn/v1` |
 | `model` | Model name to use | ❌ No | `Qwen3-Coder` |
 | `working_directory` | Working directory to run iFlow CLI from | ❌ No | `.` |

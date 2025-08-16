@@ -110,7 +110,7 @@ jobs:
 |-------|-------------|----------|---------|
 | `prompt` | 要使用 iFlow CLI 执行的提示 | ✅ 是 | - |
 | `api_key` | 用于认证的 iFlow API 密钥 | ✅ 是 | - |
-| `settings_json` | 完整的 iFlow settings.json 内容（JSON 字符串）。如果提供，将覆盖其他配置选项。 | ❌ 否 | - |
+| `settings_json` | 完整的 `~/.iflow/settings.json` 内容（JSON 字符串）。如果提供，将覆盖其他配置选项。 | ❌ 否 | - |
 | `base_url` | iFlow API 的自定义基础 URL | ❌ 否 | `https://apis.iflow.cn/v1` |
 | `model` | 要使用的模型名称 | ❌ 否 | `Qwen3-Coder` |
 | `working_directory` | 运行 iFlow CLI 的工作目录 | ❌ 否 | `.` |
