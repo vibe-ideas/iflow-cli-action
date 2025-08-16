@@ -4,7 +4,7 @@ FROM ubuntu:22.04 AS runtime-base
 # Set noninteractive installation mode to avoid prompts
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install runtime dependencies including Node.js
+# Install runtime dependencies including Node.js, GitHub CLI, Go, and other tools
 RUN apt-get update -y && apt-get -y upgrade \
     && apt-get install -y \
         wget \
@@ -37,40 +37,31 @@ RUN apt-get update -y && apt-get -y upgrade \
     && add-apt-repository ppa:xmake-io/xmake \
     && apt-get update -y \
     && apt install xmake linux-tools-generic google-perftools libgoogle-perftools-dev -y \
-    && apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-# Install GitHub CLI (gh)
-RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg && \
-    chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg && \
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null && \
-    apt-get update && \
-    apt-get install -y gh && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-# Install Go for github-mcp-server
-# Download and install Go
-ENV GO_VERSION=1.23.2
-RUN wget https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz \
-    && tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz \
-    && rm go${GO_VERSION}.linux-amd64.tar.gz
+    # Install GitHub CLI (gh)
+    && curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+    && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+    && apt-get update \
+    && apt-get install -y gh \
+    # Install Go for github-mcp-server
+    && wget https://go.dev/dl/go1.23.2.linux-amd64.tar.gz \
+    && tar -C /usr/local -xzf go1.23.2.linux-amd64.tar.gz \
+    && rm go1.23.2.linux-amd64.tar.gz \
+    # Pre-install iFlow CLI using npm package
+    && npm install -g @iflow-ai/iflow-cli \
+    # Install uv - ultra-fast Python package manager
+    && curl -LsSf https://astral.sh/uv/install.sh | sh \
+    # Install github-mcp-server CLI tool
+    && /usr/local/go/bin/go install github.com/github/github-mcp-server/cmd/github-mcp-server@latest \
+    # Clean up apt cache
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Set Go environment variables
 ENV PATH=$PATH:/usr/local/go/bin
 ENV GOROOT=/usr/local/go
 ENV GOPATH=/go
 ENV PATH=$PATH:$GOPATH/bin
-
-# https://www.npmjs.com/package/@iflow-ai/iflow-cli
-# Pre-install iFlow CLI using npm package
-RUN npm install -g @iflow-ai/iflow-cli
-
-# Install uv - ultra-fast Python package manager
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Install github-mcp-server CLI tool
-RUN /usr/local/go/bin/go install github.com/github/github-mcp-server/cmd/github-mcp-server@latest
 
 # Use official Go 1.24.4 image for building
 FROM golang:1.24.4-bullseye AS builder
