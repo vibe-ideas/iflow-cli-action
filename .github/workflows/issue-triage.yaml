@@ -25,7 +25,6 @@ defaults:
 
 permissions:
   contents: 'read'
-  id-token: 'write'
   issues: 'write'
   statuses: 'write'
 
