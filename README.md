@@ -1,6 +1,6 @@
 # 🤖 iFlow CLI GitHub Action
 
-A GitHub Action that enables you to run [iFlow CLI](https://github.com/iflow-ai/iflow-cli) commands within your GitHub workflows. This Docker-based action comes with Node.js 22 and npm pre-installed for optimal performance, and executes your specified commands using the iFlow CLI.
+A GitHub Action that enables you to run [iFlow CLI](https://github.com/iflow-ai/iflow-cli) commands within your GitHub workflows. This Docker-based action comes with Node.js 22, npm, and uv (ultra-fast Python package manager) pre-installed for optimal performance, and executes your specified commands using the iFlow CLI.
 
 - [中文文档](README_zh.md)
 
@@ -8,7 +8,7 @@ A GitHub Action that enables you to run [iFlow CLI](https://github.com/iflow-ai/
 
 ## Features
 
-- ✅ Docker-based action with pre-installed Node.js 22 and npm
+- ✅ Docker-based action with pre-installed Node.js 22, npm, and uv
 - ✅ Configurable authentication with iFlow API
 - ✅ Support for custom models and API endpoints
 - ✅ Flexible command execution with timeout control

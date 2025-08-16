@@ -1,12 +1,12 @@
 # 🤖 iFlow CLI GitHub Action
 
-一个 GitHub Action，使您能够在 GitHub 工作流中运行 [iFlow CLI](https://github.com/iflow-ai/iflow-cli) 命令。这个基于 Docker 的操作预装了 Node.js 22 和 npm 以实现最佳性能，并使用 iFlow CLI 执行您指定的命令。
+一个 GitHub Action，使您能够在 GitHub 工作流中运行 [iFlow CLI](https://github.com/iflow-ai/iflow-cli) 命令。这个基于 Docker 的操作预装了 Node.js 22、npm 和 uv（超快 Python 包管理器）以实现最佳性能，并使用 iFlow CLI 执行您指定的命令。
 
 > 文档站点（使用 iFlow CLI GitHub Action 生成）：[https://vibe-ideas.github.io/iflow-cli-action/](https://vibe-ideas.github.io/iflow-cli-action/)
 
 ## 功能特性
 
-- ✅ 基于 Docker 的操作，预装 Node.js 22 和 npm
+- ✅ 基于 Docker 的操作，预装 Node.js 22、npm 和 uv
 - ✅ 可配置的 iFlow API 认证
 - ✅ 支持自定义模型和 API 端点
 - ✅ 灵活的命令执行和超时控制

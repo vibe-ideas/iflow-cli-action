@@ -11,7 +11,7 @@ This repository is a GitHub Action that wraps the iFlow CLI, enabling users to r
 1. **Main Components**:
    - `main.go`: Entry point that executes the root command
    - `cmd/root.go`: Core logic implementing the Cobra command structure
-   - `Dockerfile`: Multi-stage build creating a runtime with Node.js 22 and iFlow CLI
+   - `Dockerfile`: Multi-stage build creating a runtime with Node.js 22, npm, and uv
    - `action.yml`: GitHub Action definition with inputs/outputs
 
 2. **Key Features**:
@@ -32,6 +32,8 @@ go build -o iflow-action .
 # Build Docker image
 docker build -t iflow-cli-action .
 ```
+
+The Docker image includes Node.js 22, npm, and uv (ultra-fast Python package manager).
 
 ### Testing
 

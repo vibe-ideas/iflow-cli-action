@@ -66,6 +66,9 @@ ENV PATH=$PATH:$GOPATH/bin
 # Pre-install iFlow CLI using npm package
 RUN npm install -g @iflow-ai/iflow-cli
 
+# Install uv - ultra-fast Python package manager
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+
 # Install github-mcp-server CLI tool
 RUN /usr/local/go/bin/go install github.com/github/github-mcp-server/cmd/github-mcp-server@latest
 
