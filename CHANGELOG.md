@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Advanced GitHub Workflow Examples**: Added comprehensive examples for automated GitHub issue and PR management
+  - Issue Killer: Implements features based on GitHub issues with automated PR creation
+  - Issue Triage: Automatically labels new issues with appropriate tags
+  - PR Review: Provides automated code review for pull requests
+  - PR Review Killer: Enables direct code modifications based on PR comments
+- **Enhanced Docker Image**: Embedded uv Python package manager in Docker image for faster dependency installation
+- **Vibe Ideas Workflow**: Added new workflow for generating project ideas and suggestions
+- **Pre-execution Commands Support**: New `precmd` input parameter allows running shell commands before executing iFlow CLI
+- **Multi-line Command Support**: Enhanced `precmd` to support multiple shell commands separated by newlines
+
+### Changed
+
+- **Dockerfile Improvements**: Updated CI image configuration and Dockerfile reference
+- **Repository Updates**: Updated repository URLs and references
+- **Dependency Management**: Added more dependencies to Dockerfile as requested in issue #7
+- **Documentation**: Updated README files and added comprehensive documentation for new workflow examples
+- **Security**: Added id-token permission for deploy workflow
+- **Performance**: Reduced the number of image layers in the Dockerfile
+- **Configuration**: Extracted hard-coded bot name to configurable repo variable
+- **Node.js Installation**: Added Node.js installation to Dockerfile for npm availability
+
 ## [1.3.0] - 2025-08-16
 
 ### Added
