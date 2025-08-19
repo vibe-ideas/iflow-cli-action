@@ -1,6 +1,6 @@
 name: 'iFlow CLI Action'
 description: 'Execute iFlow CLI commands in GitHub Actions workflows'
-author: 'vibe-ideas'
+author: 'iflow-ai'
 branding:
   icon: 'terminal'
   color: 'blue'

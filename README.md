@@ -4,7 +4,7 @@ A GitHub Action that enables you to run [iFlow CLI](https://github.com/iflow-ai/
 
 - [中文文档](README_zh.md)
 
-> Docs Site (generated with iFlow CLI GitHub Action): [https://vibe-ideas.github.io/iflow-cli-action/](https://vibe-ideas.github.io/iflow-cli-action/)
+> Docs Site (generated with iFlow CLI GitHub Action): [https://iflow-ai.github.io/iflow-cli-action/](https://iflow-ai.github.io/iflow-cli-action/)
 
 ## Features
 
