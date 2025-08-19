@@ -37,6 +37,9 @@ RUN apt-get update -y && apt-get -y upgrade \
     && add-apt-repository ppa:xmake-io/xmake \
     && apt-get update -y \
     && apt install xmake linux-tools-generic google-perftools libgoogle-perftools-dev -y \
+    # Install Node.js (newer LTS) so npm is available for later steps
+    && curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
+    && apt-get install -y nodejs \
     # Install GitHub CLI (gh)
     && curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
     && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
