@@ -124,8 +124,8 @@ jobs:
                 - 优化搜索引擎索引。
             
             请直接创建完整的 HTML 文件，使用内联 CSS 和 JavaScript，确保文件自包含且可以直接在浏览器中运行。
-            
-            项目地址为：https://github.com/vibe-ideas/iflow-cli-action
+
+            项目地址为：https://github.com/iflow-ai/iflow-cli-action
           api_key: ${{ secrets.IFLOW_API_KEY }}
           # settings_json: ${{ secrets.IFLOW_SETTINGS_JSON }}
           model: "Qwen3-Coder"

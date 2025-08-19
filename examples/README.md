@@ -174,7 +174,7 @@ jobs:
           } >> "${GITHUB_OUTPUT}"
 
       - name: 'Run iFLOW CLI PR Review'
-        uses: vibe-ideas/iflow-cli-action@v1.3.0
+        uses: iflow-ai/iflow-cli-action@v1.3.0
         id: 'iflow_cli_pr_review'
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
@@ -485,7 +485,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Generate Docs
-        uses: vibe-ideas/iflow-cli-action@v1.3.0
+        uses: iflow-ai/iflow-cli-action@v1.3.0
         with:
           prompt: "/init && Generate comprehensive documentation for this project"
           api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -511,7 +511,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run iFlow with Custom Args
-        uses: vibe-ideas/iflow-cli-action@v1.3.0
+        uses: iflow-ai/iflow-cli-action@v1.3.0
         with:
           prompt: "Analyze the codebase and provide insights"
           api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -533,7 +533,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Security Scan
-        uses: vibe-ideas/iflow-cli-action@v1.3.0
+        uses: iflow-ai/iflow-cli-action@v1.3.0
         with:
           prompt: "Analyze this codebase for security vulnerabilities and provide recommendations"
           api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -557,14 +557,14 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: Project Overview
-        uses: vibe-ideas/iflow-cli-action@v1.3.0
+        uses: iflow-ai/iflow-cli-action@v1.3.0
         with:
           prompt: "/init"
           api_key: ${{ secrets.IFLOW_API_KEY }}
         id: init
       
       - name: Architecture Analysis
-        uses: vibe-ideas/iflow-cli-action@v1.3.0
+        uses: iflow-ai/iflow-cli-action@v1.3.0
         with:
           prompt: "Based on the project analysis, provide detailed architecture recommendations"
           api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -572,7 +572,7 @@ jobs:
         id: arch
       
       - name: Performance Review
-        uses: vibe-ideas/iflow-cli-action@v1.3.0
+        uses: iflow-ai/iflow-cli-action@v1.3.0
         with:
           prompt: "Analyze the code for performance bottlenecks and optimization opportunities"
           api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -600,7 +600,7 @@ jobs:
 
 ```yaml
 - name: Use Custom Model
-  uses: vibe-ideas/iflow-cli-action@v1.3.0
+  uses: iflow-ai/iflow-cli-action@v1.3.0
   with:
     prompt: "Analyze this code"
     api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -612,7 +612,7 @@ jobs:
 
 ```yaml
 - name: Complex Analysis
-  uses: vibe-ideas/iflow-cli-action@v1.3.0
+  uses: iflow-ai/iflow-cli-action@v1.3.0
   with:
     prompt: "Perform comprehensive code analysis and refactoring suggestions"
     api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -623,7 +623,7 @@ jobs:
 
 ```yaml
 - name: Analyze Specific Module
-  uses: vibe-ideas/iflow-cli-action@v1.3.0
+  uses: iflow-ai/iflow-cli-action@v1.3.0
   with:
     prompt: "Analyze this module for improvement opportunities"
     api_key: ${{ secrets.IFLOW_API_KEY }}
@@ -709,7 +709,7 @@ jobs:
             core.setOutput('implementation_request', implementation_request);
 
       - name: 'Run iFlow CLI Implementation'
-        uses: vibe-ideas/iflow-cli-action@v1.3.0
+        uses: iflow-ai/iflow-cli-action@v1.3.0
         id: 'iflow_cli_implementation'
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
@@ -876,7 +876,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: 'Run iFlow CLI Issue Triage'
-        uses: vibe-ideas/iflow-cli-action@v1.3.0
+        uses: iflow-ai/iflow-cli-action@v1.3.0
         id: 'iflow_cli_issue_triage'
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
@@ -995,7 +995,7 @@ jobs:
           echo "instructions=$INSTRUCTIONS" >> $GITHUB_OUTPUT
 
       - name: 'Run iFlow CLI Implementation'
-        uses: vibe-ideas/iflow-cli-action@v1.3.0
+        uses: iflow-ai/iflow-cli-action@v1.3.0
         id: 'iflow_cli_implementation'
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'

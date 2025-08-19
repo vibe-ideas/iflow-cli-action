@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/vibe-ideas/iflow-cli-action/cmd"
+	"github.com/iflow-ai/iflow-cli-action/cmd"
 )
 
 func main() {
