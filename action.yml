@@ -48,4 +48,4 @@ outputs:
 
 runs:
   using: 'docker'
-  image: 'ghcr.io/vibe-ideas/iflow-cli-action:main'
+  image: 'Dockerfile'

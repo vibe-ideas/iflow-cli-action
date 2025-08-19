@@ -33,6 +33,5 @@ jobs:
         with:
             context: . # Path to your Dockerfile and build context
             push: true
-            visibility: public
             tags: ${{ steps.meta.outputs.tags }}
             labels: ${{ steps.meta.outputs.labels }}
