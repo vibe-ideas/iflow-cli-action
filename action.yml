@@ -48,4 +48,4 @@ outputs:
 
 runs:
   using: 'docker'
-  image: 'Dockerfile'
+  image: 'ghcr.io/iflow-ai/iflow-cli-action:main'
