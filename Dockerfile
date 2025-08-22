@@ -34,6 +34,7 @@ RUN apt-get update -y && apt-get -y upgrade \
         file \
         vim \
         zlib1g-dev \
+        ripgrep \
     && add-apt-repository ppa:xmake-io/xmake \
     && apt-get update -y \
     && apt install xmake linux-tools-generic google-perftools libgoogle-perftools-dev -y \
