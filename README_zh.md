@@ -1,5 +1,41 @@
 # 🤖 iFlow CLI GitHub Action
 
+<!-- toc -->
+
+- [功能特性](#%E5%8A%9F%E8%83%BD%E7%89%B9%E6%80%A7)
+- [使用方法](#%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95)
+  * [基础示例](#%E5%9F%BA%E7%A1%80%E7%A4%BA%E4%BE%8B)
+  * [高级示例](#%E9%AB%98%E7%BA%A7%E7%A4%BA%E4%BE%8B)
+  * [多命令示例](#%E5%A4%9A%E5%91%BD%E4%BB%A4%E7%A4%BA%E4%BE%8B)
+- [输入参数](#%E8%BE%93%E5%85%A5%E5%8F%82%E6%95%B0)
+- [输出参数](#%E8%BE%93%E5%87%BA%E5%8F%82%E6%95%B0)
+- [认证](#%E8%AE%A4%E8%AF%81)
+  * [获取 iFlow API 密钥](#%E8%8E%B7%E5%8F%96-iflow-api-%E5%AF%86%E9%92%A5)
+  * [可用模型](#%E5%8F%AF%E7%94%A8%E6%A8%A1%E5%9E%8B)
+- [自定义配置](#%E8%87%AA%E5%AE%9A%E4%B9%89%E9%85%8D%E7%BD%AE)
+  * [使用附加参数](#%E4%BD%BF%E7%94%A8%E9%99%84%E5%8A%A0%E5%8F%82%E6%95%B0)
+    + [附加参数示例](#%E9%99%84%E5%8A%A0%E5%8F%82%E6%95%B0%E7%A4%BA%E4%BE%8B)
+  * [使用预执行命令](#%E4%BD%BF%E7%94%A8%E9%A2%84%E6%89%A7%E8%A1%8C%E5%91%BD%E4%BB%A4)
+    + [多行命令](#%E5%A4%9A%E8%A1%8C%E5%91%BD%E4%BB%A4)
+    + [带引号的参数](#%E5%B8%A6%E5%BC%95%E5%8F%B7%E7%9A%84%E5%8F%82%E6%95%B0)
+  * [使用自定义设置](#%E4%BD%BF%E7%94%A8%E8%87%AA%E5%AE%9A%E4%B9%89%E8%AE%BE%E7%BD%AE)
+- [使用 MCP 服务器](#%E4%BD%BF%E7%94%A8-mcp-%E6%9C%8D%E5%8A%A1%E5%99%A8)
+  * [示例：使用 DeepWiki MCP 服务器](#%E7%A4%BA%E4%BE%8B%E4%BD%BF%E7%94%A8-deepwiki-mcp-%E6%9C%8D%E5%8A%A1%E5%99%A8)
+  * [何时使用 MCP 服务器](#%E4%BD%95%E6%97%B6%E4%BD%BF%E7%94%A8-mcp-%E6%9C%8D%E5%8A%A1%E5%99%A8)
+- [Common Use Cases](#common-use-cases)
+  * [Code Analysis and Review](#code-analysis-and-review)
+  * [Documentation Generation](#documentation-generation)
+  * [Automated Testing Suggestions](#automated-testing-suggestions)
+  * [Architecture Analysis](#architecture-analysis)
+- [Troubleshooting](#troubleshooting)
+  * [常见问题](#%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98)
+  * [调试模式](#%E8%B0%83%E8%AF%95%E6%A8%A1%E5%BC%8F)
+- [贡献](#%E8%B4%A1%E7%8C%AE)
+- [许可证](#%E8%AE%B8%E5%8F%AF%E8%AF%81)
+- [相关链接](#%E7%9B%B8%E5%85%B3%E9%93%BE%E6%8E%A5)
+
+<!-- tocstop -->
+
 一个 GitHub Action，使您能够在 GitHub 工作流中运行 [iFlow CLI](https://github.com/iflow-ai/iflow-cli) 命令。这个基于 Docker 的操作预装了 Node.js 22、npm 和 uv（超快 Python 包管理器）以实现最佳性能，并使用 iFlow CLI 执行您指定的命令。
 
 > 文档站点（使用 iFlow CLI GitHub Action 生成）：[https://iflow-ai.github.io/iflow-cli-action/](https://iflow-ai.github.io/iflow-cli-action/)

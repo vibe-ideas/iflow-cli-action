@@ -10,6 +10,10 @@ The workflow uses the `markdown-toc` npm package to automatically generate and i
 2. Pull requests to the main branch that modify Markdown files
 3. Manual triggering via workflow_dispatch
 
+The workflow has two main steps:
+1. Add TOC markers (`<!-- toc -->` and `<!-- tocstop -->`) to all Markdown files that don't already have them
+2. Generate and insert the actual table of contents between these markers
+
 ## Setup Instructions
 
 1. Add this workflow file to your repository at `.github/workflows/generate-toc.yml`
@@ -30,10 +34,13 @@ You can customize the workflow by modifying these parameters:
 After running, your Markdown files will have a table of contents automatically inserted. For example:
 
 ```markdown
+
 <!-- toc -->
+
 - [Section 1](#section-1)
   * [Subsection 1.1](#subsection-11)
 - [Section 2](#section-2)
+
 <!-- tocstop -->
 
 # Section 1

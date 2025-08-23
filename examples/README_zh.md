@@ -1,5 +1,32 @@
 # 示例工作流
 
+<!-- toc -->
+
+- [基本示例](#%E5%9F%BA%E6%9C%AC%E7%A4%BA%E4%BE%8B)
+  * [在拉取请求上进行代码审查](#%E5%9C%A8%E6%8B%89%E5%8F%96%E8%AF%B7%E6%B1%82%E4%B8%8A%E8%BF%9B%E8%A1%8C%E4%BB%A3%E7%A0%81%E5%AE%A1%E6%9F%A5)
+  * [文档生成](#%E6%96%87%E6%A1%A3%E7%94%9F%E6%88%90)
+  * [使用额外参数](#%E4%BD%BF%E7%94%A8%E9%A2%9D%E5%A4%96%E5%8F%82%E6%95%B0)
+  * [安全分析](#%E5%AE%89%E5%85%A8%E5%88%86%E6%9E%90)
+  * [TOC 生成](#toc-%E7%94%9F%E6%88%90)
+- [高级示例](#%E9%AB%98%E7%BA%A7%E7%A4%BA%E4%BE%8B)
+  * [多步骤分析](#%E5%A4%9A%E6%AD%A5%E9%AA%A4%E5%88%86%E6%9E%90)
+- [配置示例](#%E9%85%8D%E7%BD%AE%E7%A4%BA%E4%BE%8B)
+  * [自定义模型配置](#%E8%87%AA%E5%AE%9A%E4%B9%89%E6%A8%A1%E5%9E%8B%E9%85%8D%E7%BD%AE)
+  * [延长超时以处理复杂任务](#%E5%BB%B6%E9%95%BF%E8%B6%85%E6%97%B6%E4%BB%A5%E5%A4%84%E7%90%86%E5%A4%8D%E6%9D%82%E4%BB%BB%E5%8A%A1)
+  * [不同的工作目录](#%E4%B8%8D%E5%90%8C%E7%9A%84%E5%B7%A5%E4%BD%9C%E7%9B%AE%E5%BD%95)
+- [其他工作流](#%E5%85%B6%E4%BB%96%E5%B7%A5%E4%BD%9C%E6%B5%81)
+  * [问题终结者](#%E9%97%AE%E9%A2%98%E7%BB%88%E7%BB%93%E8%80%85)
+  * [问题分类](#%E9%97%AE%E9%A2%98%E5%88%86%E7%B1%BB)
+  * [PR 审查终结者](#pr-%E5%AE%A1%E6%9F%A5%E7%BB%88%E7%BB%93%E8%80%85)
+- [执行机制](#%E6%89%A7%E8%A1%8C%E6%9C%BA%E5%88%B6)
+  * [问题终结者执行](#%E9%97%AE%E9%A2%98%E7%BB%88%E7%BB%93%E8%80%85%E6%89%A7%E8%A1%8C)
+  * [问题分类执行](#%E9%97%AE%E9%A2%98%E5%88%86%E7%B1%BB%E6%89%A7%E8%A1%8C)
+  * [PR 审查执行](#pr-%E5%AE%A1%E6%9F%A5%E6%89%A7%E8%A1%8C)
+  * [PR 审查终结者执行](#pr-%E5%AE%A1%E6%9F%A5%E7%BB%88%E7%BB%93%E8%80%85%E6%89%A7%E8%A1%8C)
+- [设置说明](#%E8%AE%BE%E7%BD%AE%E8%AF%B4%E6%98%8E)
+
+<!-- tocstop -->
+
 此目录包含示例 GitHub Actions 工作流，演示如何使用 iFlow CLI Action。
 
 **注意：** 所有 iFlow CLI 命令都会自动使用 `--prompt` 和 `--yolo` 标志执行，以实现非交互式、简化的操作。
@@ -523,13 +550,42 @@ jobs:
       - name: 安装 markdown-toc
         run: npm install -g markdown-toc
 
+      - name: 为所有 Markdown 文件添加 TOC 标记
+        run: |
+          # 为所有没有 TOC 标记的 Markdown 文件添加标记
+          find . -name "*.md" -not -path "./.git/*" -not -path "./node_modules/*" | while read file; do
+            echo "处理 $file"
+            
+            # 检查文件是否已有 TOC 标记
+            if ! grep -q "<!-- toc -->" "$file"; then
+              echo "  为 $file 添加 TOC 标记"
+              
+              # 创建临时文件
+              temp_file=$(mktemp)
+              
+              # 在第一行（标题）后添加 TOC 标记
+              {
+                head -1 "$file"
+                echo ""
+                echo "<!-- toc -->"
+                echo ""
+                echo "<!-- tocstop -->"
+                echo ""
+                tail -n +2 "$file"
+              } > "$temp_file"
+              
+              # 替换原文件
+              mv "$temp_file" "$file"
+            else
+              echo "  $file 已有 TOC 标记"
+            fi
+          done
+
       - name: 为所有 Markdown 文件生成 TOC
         run: |
           # 查找所有 markdown 文件并为每个文件生成 TOC
           find . -name "*.md" -not -path "./.git/*" -not -path "./node_modules/*" | while read file; do
             echo "处理 $file"
-            # 创建原始文件的备份
-            cp "$file" "$file.bak"
             # 生成并插入 TOC
             markdown-toc -i "$file" || echo "处理 $file 失败"
           done

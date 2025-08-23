@@ -1,5 +1,32 @@
 # Example Workflows
 
+<!-- toc -->
+
+- [Basic Examples](#basic-examples)
+  * [Code Review on Pull Request](#code-review-on-pull-request)
+  * [Documentation Generation](#documentation-generation)
+  * [Using Extra Arguments](#using-extra-arguments)
+  * [Security Analysis](#security-analysis)
+  * [TOC Generation](#toc-generation)
+- [Advanced Examples](#advanced-examples)
+  * [Multi-step Analysis](#multi-step-analysis)
+- [Configuration Examples](#configuration-examples)
+  * [Custom Model Configuration](#custom-model-configuration)
+  * [Extended Timeout for Complex Tasks](#extended-timeout-for-complex-tasks)
+  * [Different Working Directory](#different-working-directory)
+- [Additional Workflows](#additional-workflows)
+  * [Issue Killer](#issue-killer)
+  * [Issue Triage](#issue-triage)
+  * [PR Review Killer](#pr-review-killer)
+- [Execution Mechanism](#execution-mechanism)
+  * [Issue Killer Execution](#issue-killer-execution)
+  * [Issue Triage Execution](#issue-triage-execution)
+  * [PR Review Execution](#pr-review-execution)
+  * [PR Review Killer Execution](#pr-review-killer-execution)
+- [Setup Instructions](#setup-instructions)
+
+<!-- tocstop -->
+
 This directory contains example GitHub Actions workflows demonstrating how to use the iFlow CLI Action.
 
 **Note:** All iFlow CLI commands are automatically executed with `--prompt` and `--yolo` flags for non-interactive, streamlined operation.
@@ -574,13 +601,42 @@ jobs:
       - name: Install markdown-toc
         run: npm install -g markdown-toc
 
+      - name: Add TOC markers to all Markdown files
+        run: |
+          # Add TOC markers to all markdown files that don't have them
+          find . -name "*.md" -not -path "./.git/*" -not -path "./node_modules/*" | while read file; do
+            echo "Processing $file"
+            
+            # Check if file already has TOC markers
+            if ! grep -q "<!-- toc -->" "$file"; then
+              echo "  Adding TOC markers to $file"
+              
+              # Create a temporary file
+              temp_file=$(mktemp)
+              
+              # Add TOC markers after the first line (title)
+              {
+                head -1 "$file"
+                echo ""
+                echo "<!-- toc -->"
+                echo ""
+                echo "<!-- tocstop -->"
+                echo ""
+                tail -n +2 "$file"
+              } > "$temp_file"
+              
+              # Replace the original file
+              mv "$temp_file" "$file"
+            else
+              echo "  $file already has TOC markers"
+            fi
+          done
+
       - name: Generate TOC for all Markdown files
         run: |
           # Find all markdown files and generate TOC for each
           find . -name "*.md" -not -path "./.git/*" -not -path "./node_modules/*" | while read file; do
             echo "Processing $file"
-            # Create a backup of the original file
-            cp "$file" "$file.bak"
             # Generate and insert TOC
             markdown-toc -i "$file" || echo "Failed to process $file"
           done

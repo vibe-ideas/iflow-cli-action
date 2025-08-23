@@ -1,5 +1,19 @@
 # IFLOW.md
 
+<!-- toc -->
+
+- [Project Overview](#project-overview)
+- [Architecture](#architecture)
+- [Development Commands](#development-commands)
+  * [Building](#building)
+  * [Testing](#testing)
+  * [Running](#running)
+- [Code Structure](#code-structure)
+- [Common Development Tasks](#common-development-tasks)
+- [Testing Changes](#testing-changes)
+
+<!-- tocstop -->
+
 This file provides guidance to iFlow Cli when working with code in this repository.
 
 ## Project Overview

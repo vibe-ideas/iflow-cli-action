@@ -1,9 +1,6 @@
 ---
-name: go-expert
-description: Go specialist focusing on idiomatic Go, concurrency, and performance optimization.
-model: claude-sonnet-4-20250514
+{}
 ---
-
 # Focus Areas
 
 - Concurrency with goroutines and channels
@@ -55,3 +52,4 @@ model: claude-sonnet-4-20250514
 - Demonstrated proficiency in Go’s concurrency model
 - Clear error handling strategy and implementation
 - High-quality Go applications ready for production deployment
+

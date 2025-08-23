@@ -1,5 +1,17 @@
 # iFLOW CLI Action
 
+<!-- toc -->
+
+- [快速开始](#%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B)
+- [更多示例使用场景](#%E6%9B%B4%E5%A4%9A%E7%A4%BA%E4%BE%8B%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF)
+- [最佳实践](#%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5)
+  * [IFLOW.md](#iflowmd)
+  * [安全考虑](#%E5%AE%89%E5%85%A8%E8%80%83%E8%99%91)
+  * [GitHub Actions 使用成本](#github-actions-%E4%BD%BF%E7%94%A8%E6%88%90%E6%9C%AC)
+- [社区使用案例](#%E7%A4%BE%E5%8C%BA%E4%BD%BF%E7%94%A8%E6%A1%88%E4%BE%8B)
+
+<!-- tocstop -->
+
 [iflow-cli-action](https://github.com/marketplace/actions/iflow-cli-action) 提供了基于 [GitHub Actions]((https://docs.github.com/zh/actions/get-started/quickstart)) 的自动化工作流集成能力. 使用它, 您可以几分钟内将 iFLOW CLI 的 AI 能力集成到 GitHub 代码库中, 使用 AI 去驱动任意自定义的自动化工作流程.
 
 [在 GitHub Actions 市场上查看](https://github.com/marketplace/actions/iflow-cli-action)
