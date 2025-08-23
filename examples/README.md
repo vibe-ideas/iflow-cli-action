@@ -541,6 +541,72 @@ jobs:
           timeout: "900"
 ```
 
+### TOC Generation
+
+```yaml
+# .github/workflows/generate-toc.yml
+name: Generate TOC for Markdown files
+
+on:
+  push:
+    branches: [main]
+    paths: ['**.md']
+  pull_request:
+    branches: [main]
+    paths: ['**.md']
+  workflow_dispatch:
+
+jobs:
+  generate-toc:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install markdown-toc
+        run: npm install -g markdown-toc
+
+      - name: Generate TOC for all Markdown files
+        run: |
+          # Find all markdown files and generate TOC for each
+          find . -name "*.md" -not -path "./.git/*" -not -path "./node_modules/*" | while read file; do
+            echo "Processing $file"
+            # Create a backup of the original file
+            cp "$file" "$file.bak"
+            # Generate and insert TOC
+            markdown-toc -i "$file" || echo "Failed to process $file"
+          done
+
+      - name: Check for changes
+        id: changes
+        run: |
+          # Check if any files were modified
+          if git diff --quiet; then
+            echo "no_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "no_changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit changes
+        if: steps.changes.outputs.no_changes == 'false'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "docs: auto-generate table of contents for Markdown files"
+          branch: ${{ github.head_ref || github.ref_name }}
+          file_pattern: "*.md"
+          commit_user_name: github-actions[bot]
+          commit_user_email: github-actions[bot]@users.noreply.github.com
+          commit_author: github-actions[bot] <github-actions[bot]@users.noreply.github.com>
+```
+
 ## Advanced Examples
 
 ### Multi-step Analysis

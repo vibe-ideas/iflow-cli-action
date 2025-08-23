@@ -490,6 +490,72 @@ jobs:
           timeout: "900"
 ```
 
+### TOC 生成
+
+```yaml
+# .github/workflows/generate-toc.yml
+name: 为 Markdown 文件生成 TOC
+
+on:
+  push:
+    branches: [main]
+    paths: ['**.md']
+  pull_request:
+    branches: [main]
+    paths: ['**.md']
+  workflow_dispatch:
+
+jobs:
+  generate-toc:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出仓库
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 设置 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: 安装 markdown-toc
+        run: npm install -g markdown-toc
+
+      - name: 为所有 Markdown 文件生成 TOC
+        run: |
+          # 查找所有 markdown 文件并为每个文件生成 TOC
+          find . -name "*.md" -not -path "./.git/*" -not -path "./node_modules/*" | while read file; do
+            echo "处理 $file"
+            # 创建原始文件的备份
+            cp "$file" "$file.bak"
+            # 生成并插入 TOC
+            markdown-toc -i "$file" || echo "处理 $file 失败"
+          done
+
+      - name: 检查更改
+        id: changes
+        run: |
+          # 检查是否有文件被修改
+          if git diff --quiet; then
+            echo "no_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "no_changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 提交更改
+        if: steps.changes.outputs.no_changes == 'false'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "docs: 为 Markdown 文件自动生成目录"
+          branch: ${{ github.head_ref || github.ref_name }}
+          file_pattern: "*.md"
+          commit_user_name: github-actions[bot]
+          commit_user_email: github-actions[bot]@users.noreply.github.com
+          commit_author: github-actions[bot] <github-actions[bot]@users.noreply.github.com>
+```
+
 ## 高级示例
 
 ### 多步骤分析
