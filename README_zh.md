@@ -2,6 +2,8 @@
 
 一个 GitHub Action，使您能够在 GitHub 工作流中运行 [iFlow CLI](https://github.com/iflow-ai/iflow-cli) 命令。这个基于 Docker 的操作预装了 Node.js 22、npm 和 uv（超快 Python 包管理器）以实现最佳性能，并使用 iFlow CLI 执行您指定的命令。
 
+- [English Docs](README.md)
+
 > 文档站点（使用 iFlow CLI GitHub Action 生成）：[https://iflow-ai.github.io/iflow-cli-action/](https://iflow-ai.github.io/iflow-cli-action/)
 
 ## 功能特性
@@ -13,95 +15,115 @@
 - ✅ 可在任何工作目录中运行
 - ✅ 使用 Go 构建，快速可靠
 - ✅ **GitHub Actions 摘要集成**：在 PR 摘要中提供丰富的执行报告
+- ✅ PR/问题集成：与 GitHub 评论和 PR 审查无缝协作
 
 ## 使用方法
 
 ### 基础示例
 
-```yaml
-name: iFlow CLI 示例
-on: [push]
-
-jobs:
-  analyze-code:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: 运行 iFlow CLI
-        uses: iflow-ai/iflow-cli-action@v1.3.0
-        with:
-          prompt: "分析此代码库并提出改进建议"
-          api_key: ${{ secrets.IFLOW_API_KEY }}
-```
-
-### 高级示例
+使用 iFLOW CLI 进行问题分类：
 
 ```yaml
-name: 高级 iFlow CLI 用法
-on: 
-  pull_request:
-    types: [opened, synchronize]
+name: '🏷️ iFLOW CLI 自动化问题分类'
+
+on:
+  issues:
+    types:
+      - 'opened'
+      - 'reopened'
+  issue_comment:
+    types:
+      - 'created'
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: '要分类的问题编号'
+        required: true
+        type: 'number'
+
+concurrency:
+  group: '${{ github.workflow }}-${{ github.event.issue.number }}'
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: 'bash'
+
+permissions:
+  contents: 'read'
+  issues: 'write'
+  statuses: 'write'
 
 jobs:
-  code-review:
-    runs-on: ubuntu-latest
+  triage-issue:
+    if: |-
+      github.event_name == 'issues' ||
+      github.event_name == 'workflow_dispatch' ||
+      (
+        github.event_name == 'issue_comment' &&
+        contains(github.event.comment.body, '@iflow-cli /triage') &&
+        contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association)
+      )
+    timeout-minutes: 5
+    runs-on: 'ubuntu-latest'
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: 初始化项目分析
+      - name: 检出仓库
+        uses: actions/checkout@v4
+
+      - name: '运行 iFlow CLI 问题分类'
         uses: iflow-ai/iflow-cli-action@v1.3.0
+        id: 'iflow_cli_issue_triage'
+        env:
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+          ISSUE_TITLE: '${{ github.event.issue.title }}'
+          ISSUE_BODY: '${{ github.event.issue.body }}'
+          ISSUE_NUMBER: '${{ github.event.issue.number }}'
+          REPOSITORY: '${{ github.repository }}'
         with:
-          prompt: "/init"
           api_key: ${{ secrets.IFLOW_API_KEY }}
-          model: "Qwen3-Coder"
-          timeout: "600"
-          working_directory: "."
-      
-      - name: 生成技术文档
-        uses: iflow-ai/iflow-cli-action@v1.3.0
-        with:
-          prompt: "根据代码库分析生成技术文档"
-          api_key: ${{ secrets.IFLOW_API_KEY }}
-          base_url: "https://apis.iflow.cn/v1"
-          model: "DeepSeek-V3"
-        id: docs
-      
-      - name: 显示结果
-        run: |
-          echo "生成的文档："
-          echo "${{ steps.docs.outputs.result }}"
-```
-
-### 多命令示例
-
-```yaml
-name: 多步骤 iFlow 分析
-on: [workflow_dispatch]
-
-jobs:
-  comprehensive-analysis:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: 项目概览
-        uses: iflow-ai/iflow-cli-action@v1.3.0
-        with:
+          timeout: "3600"
+          extra_args: "--debug"
           prompt: |
-            分析项目结构并提供：
-            1. 主要架构组件
-            2. 关键依赖及其用途
-            3. 潜在的安全考虑
-          api_key: ${{ secrets.IFLOW_API_KEY }}
-          timeout: "900"
-      
-      - name: 代码质量评估
-        uses: iflow-ai/iflow-cli-action@v1.3.0
+            ## 角色
+
+            您是一个问题分类助手。分析当前的 GitHub 问题
+            并应用最合适的现有标签。使用可用的
+            工具收集信息；不要要求提供信息。
+
+            ## 步骤
+
+            1. 运行：`gh label list` 获取所有可用标签。
+            2. 审查环境变量中提供的问题标题和正文：
+               "${ISSUE_TITLE}" 和 "${ISSUE_BODY}"。
+            3. 按类型（错误、增强、文档、
+               清理等）和优先级（p0、p1、p2、p3）对问题进行分类。设置
+               标签按照 `kind/*` 和 `priority/*` 模式。
+            4. 使用以下命令将选定的标签应用到此问题：
+               `gh issue edit "${ISSUE_NUMBER}" --add-label "label1,label2"`
+            5. 如果存在 "status/needs-triage" 标签，使用以下命令移除它：
+               `gh issue edit "${ISSUE_NUMBER}" --remove-label "status/needs-triage"`
+
+            ## 指南
+
+            - 仅使用仓库中已存在的标签
+            - 不要添加评论或修改问题内容
+            - 仅分类当前问题
+            - 根据问题内容分配所有适用的标签
+            - 引用所有 shell 变量为 "${VAR}"（带引号和大括号）
+
+      - name: '发布问题分类失败评论'
+        if: |-
+          ${{ failure() && steps.iflow_cli_issue_triage.outcome == 'failure' }}
+        uses: 'actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea'
         with:
-          prompt: "审查代码以了解最佳实践、潜在错误和性能改进"
-          api_key: ${{ secrets.IFLOW_API_KEY }}
-          model: "Kimi-K2"
+          github-token: '${{ secrets.GITHUB_TOKEN }}'
+          script: |-
+            github.rest.issues.createComment({
+              owner: '${{ github.repository }}'.split('/')[0],
+              repo: '${{ github.repository }}'.split('/')[1],
+              issue_number: '${{ github.event.issue.number }}',
+              body: 'iFlow CLI 问题分类存在问题。请检查[操作日志](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})了解详情。'
+            })
 ```
 
 ## 输入参数
@@ -114,7 +136,7 @@ jobs:
 | `base_url` | iFlow API 的自定义基础 URL | ❌ 否 | `https://apis.iflow.cn/v1` |
 | `model` | 要使用的模型名称 | ❌ 否 | `Qwen3-Coder` |
 | `working_directory` | 运行 iFlow CLI 的工作目录 | ❌ 否 | `.` |
-| `timeout` | iFlow CLI 执行超时时间（秒） | ❌ 否 | `86400` |
+| `timeout` | iFlow CLI 执行超时时间（秒）（1-86400） | ❌ 否 | `86400` |
 | `extra_args` | 传递给 iFlow CLI 的附加命令行参数（空格分隔的字符串） | ❌ 否 | `` |
 | `precmd` | 在运行 iFlow CLI 之前执行的 Shell 命令（例如 "npm install", "git fetch"） | ❌ 否 | `` |
 
@@ -273,52 +295,52 @@ extra_args: '--debug'
 - 访问专业知识库或数据库
 - 扩展 iFlow CLI 功能的自定义工具
 
-## Common Use Cases
+## 常见用例
 
-### Code Analysis and Review
+### 代码分析和审查
 
 ```yaml
-- name: Code Review
+- name: 代码审查
   uses: iflow-ai/iflow-cli-action@v1.3.0
   with:
-    prompt: "Review this pull request for code quality, security issues, and best practices"
+    prompt: "审查此拉取请求的代码质量、安全问题和最佳实践"
     api_key: ${{ secrets.IFLOW_API_KEY }}
 ```
 
-### Documentation Generation
+### 文档生成
 
 ```yaml
-- name: Generate Documentation
+- name: 生成文档
   uses: iflow-ai/iflow-cli-action@v1.3.0
   with:
-    prompt: "/init && Generate comprehensive API documentation"
+    prompt: "/init && 生成全面的 API 文档"
     api_key: ${{ secrets.IFLOW_API_KEY }}
     timeout: "600"
 ```
 
-### Automated Testing Suggestions
+### 自动化测试建议
 
 ```yaml
-- name: Test Strategy
+- name: 测试策略
   uses: iflow-ai/iflow-cli-action@v1.3.0
   with:
-    prompt: "Analyze the codebase and suggest a comprehensive testing strategy with specific test cases"
+    prompt: "分析代码库并建议包含具体测试用例的全面测试策略"
     api_key: ${{ secrets.IFLOW_API_KEY }}
     model: "DeepSeek-V3"
 ```
 
-### Architecture Analysis
+### 架构分析
 
 ```yaml
-- name: Architecture Review
+- name: 架构审查
   uses: iflow-ai/iflow-cli-action@v1.3.0
   with:
-    prompt: "Analyze the system architecture and suggest improvements for scalability and maintainability"
+    prompt: "分析系统架构并提出可扩展性和可维护性改进建议"
     api_key: ${{ secrets.IFLOW_API_KEY }}
     timeout: "900"
 ```
 
-## Troubleshooting
+## 故障排除
 
 ### 常见问题
 

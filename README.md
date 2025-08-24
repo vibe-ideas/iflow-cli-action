@@ -21,90 +21,110 @@ A GitHub Action that enables you to run [iFlow CLI](https://github.com/iflow-ai/
 
 ### Basic Example
 
-```yaml
-name: iFlow CLI Example
-on: [push]
-
-jobs:
-  analyze-code:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Run iFlow CLI
-        uses: iflow-ai/iflow-cli-action@v1.3.0
-        with:
-          prompt: "Analyze this codebase and suggest improvements"
-          api_key: ${{ secrets.IFLOW_API_KEY }}
-```
-
-### Advanced Example
+Issue triage with iFLOW CLI:
 
 ```yaml
-name: Advanced iFlow CLI Usage
-on: 
-  pull_request:
-    types: [opened, synchronize]
+name: '🏷️ iFLOW CLI Automated Issue Triage'
+
+on:
+  issues:
+    types:
+      - 'opened'
+      - 'reopened'
+  issue_comment:
+    types:
+      - 'created'
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: 'issue number to triage'
+        required: true
+        type: 'number'
+
+concurrency:
+  group: '${{ github.workflow }}-${{ github.event.issue.number }}'
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: 'bash'
+
+permissions:
+  contents: 'read'
+  issues: 'write'
+  statuses: 'write'
 
 jobs:
-  code-review:
-    runs-on: ubuntu-latest
+  triage-issue:
+    if: |-
+      github.event_name == 'issues' ||
+      github.event_name == 'workflow_dispatch' ||
+      (
+        github.event_name == 'issue_comment' &&
+        contains(github.event.comment.body, '@iflow-cli /triage') &&
+        contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association)
+      )
+    timeout-minutes: 5
+    runs-on: 'ubuntu-latest'
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: Initialize Project Analysis
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 'Run iFlow CLI Issue Triage'
         uses: iflow-ai/iflow-cli-action@v1.3.0
+        id: 'iflow_cli_issue_triage'
+        env:
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+          ISSUE_TITLE: '${{ github.event.issue.title }}'
+          ISSUE_BODY: '${{ github.event.issue.body }}'
+          ISSUE_NUMBER: '${{ github.event.issue.number }}'
+          REPOSITORY: '${{ github.repository }}'
         with:
-          prompt: "/init"
           api_key: ${{ secrets.IFLOW_API_KEY }}
-          model: "Qwen3-Coder"
-          timeout: "600"
-          working_directory: "."
-      
-      - name: Generate Technical Documentation
-        uses: iflow-ai/iflow-cli-action@v1.3.0
-        with:
-          prompt: "Generate technical documentation based on the codebase analysis"
-          api_key: ${{ secrets.IFLOW_API_KEY }}
-          base_url: "https://apis.iflow.cn/v1"
-          model: "DeepSeek-V3"
-        id: docs
-      
-      - name: Display Results
-        run: |
-          echo "Documentation generated:"
-          echo "${{ steps.docs.outputs.result }}"
-```
-
-### Multiple Commands Example
-
-```yaml
-name: Multi-step iFlow Analysis
-on: [workflow_dispatch]
-
-jobs:
-  comprehensive-analysis:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Project Overview
-        uses: iflow-ai/iflow-cli-action@v1.3.0
-        with:
+          timeout: "3600"
+          extra_args: "--debug"
           prompt: |
-            Analyze the project structure and provide:
-            1. Main architectural components
-            2. Key dependencies and their purposes
-            3. Potential security considerations
-          api_key: ${{ secrets.IFLOW_API_KEY }}
-          timeout: "900"
-      
-      - name: Code Quality Assessment
-        uses: iflow-ai/iflow-cli-action@v1.3.0
+            ## Role
+
+            You are an issue triage assistant. Analyze the current GitHub issue
+            and apply the most appropriate existing labels. Use the available
+            tools to gather information; do not ask for information to be
+            provided.
+
+            ## Steps
+
+            1. Run: `gh label list` to get all available labels.
+            2. Review the issue title and body provided in the environment
+               variables: "${ISSUE_TITLE}" and "${ISSUE_BODY}".
+            3. Classify issues by their kind (bug, enhancement, documentation,
+               cleanup, etc) and their priority (p0, p1, p2, p3). Set the
+               labels according to the format `kind/*` and `priority/*` patterns.
+            4. Apply the selected labels to this issue using:
+               `gh issue edit "${ISSUE_NUMBER}" --add-label "label1,label2"`
+            5. If the "status/needs-triage" label is present, remove it using:
+               `gh issue edit "${ISSUE_NUMBER}" --remove-label "status/needs-triage"`
+
+            ## Guidelines
+
+            - Only use labels that already exist in the repository
+            - Do not add comments or modify the issue content
+            - Triage only the current issue
+            - Assign all applicable labels based on the issue content
+            - Reference all shell variables as "${VAR}" (with quotes and braces)
+
+      - name: 'Post Issue Triage Failure Comment'
+        if: |-
+          ${{ failure() && steps.iflow_cli_issue_triage.outcome == 'failure' }}
+        uses: 'actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea'
         with:
-          prompt: "Review the code for best practices, potential bugs, and performance improvements"
-          api_key: ${{ secrets.IFLOW_API_KEY }}
-          model: "Kimi-K2"
+          github-token: '${{ secrets.GITHUB_TOKEN }}'
+          script: |-
+            github.rest.issues.createComment({
+              owner: '${{ github.repository }}'.split('/')[0],
+              repo: '${{ github.repository }}'.split('/')[1],
+              issue_number: '${{ github.event.issue.number }}',
+              body: 'There is a problem with the iFlow CLI issue triaging. Please check the [action logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.'
+            })
 ```
 
 ## Inputs
