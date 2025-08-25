@@ -170,6 +170,8 @@ sequenceDiagram
 
 [examples](../examples) 目录中提供了完整基于 GitHub issues、GitHub Pull Requests 更多使用场景的自动化工作流程编排文件 (比如: 自动修复 BUG issue、自动评审等), 您可以直接拷贝到您代码仓库的 `.github/workflows` 目录中直接使用.
 
+## 最佳实践
+
 ### IFLOW.md
 
 在您的仓库根目录中创建一个 IFLOW.md 文件来定义代码风格指南、代码评审标准、项目特定规则. 此文件将指导 iFLOW CLI 理解您的项目标准. 同时可以更便于 iFLOW CLI Action 执行自动化任务.
@@ -207,5 +209,6 @@ iFLOW CLI Action 默认会控制自动化任务的执行时间在 3600 秒 (一�
 ## 社区使用案例
 
 - [使用 iflow-cli-action 在 GitHub 与 Qwen3-Coder、Kimi K2 一起快速提升你的生产力](https://shan333.cn/2025/08/16/the-next-level-of-developer-productivity-with-iflow-cli-action/)
+- [定时生成不同风格周刊列表网站](https://awesome-tech-weekly-zh.netlify.app/)
 
 > 欢迎提交您的使用案例
