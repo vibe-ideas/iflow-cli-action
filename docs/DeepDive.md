@@ -1,5 +1,24 @@
 # AI Works 效率提升 - iFlow CLI Action 使用攻略
 
+<!-- TOC start -->
+## Table of Contents
+
+- [特性](#特性)
+- [快速开始](#快速开始)
+- [更多示例工作流](#更多示例工作流)
+  - [IFLOW.md](#iflowmd)
+  - [移动端使用](#移动端使用)
+  - [安全考虑](#安全考虑)
+  - [GitHub Actions 使用成本](#github-actions-使用成本)
+- [故障排查](#故障排查)
+  - [iFLOW CLI 执行摘要报告](#iflow-cli-执行摘要报告)
+  - [超时](#超时)
+- [社区使用案例](#社区使用案例)
+
+[Back to Table of Contents](README.md#table-of-contents)
+<!-- TOC end -->
+
+
 通过 iFLOW CLI Action，可以让 [iFLOW CLI](https://platform.iflow.cn/cli/quickstart) 化身为您的 GitHub 开源项目开发伙伴. 您可以自定义任意灵活多变的工作流，智能化 & 自动化处理 issues、PRs、README 文档等.
 
 您也可以通过对话式的方式触发 iFLOW CLI 的执行, 比如在 bug issue 中评论 `@iflow-cli fix this issue` 即可触发智能化工作流帮您修复 BUG.
