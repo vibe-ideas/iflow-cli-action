@@ -6,6 +6,9 @@ This file provides guidance to iFlow Cli when working with code in this reposito
 
 This repository is a GitHub Action that wraps the iFlow CLI, enabling users to run iFlow commands within GitHub workflows. The action is built with Go and packaged in a Docker container that includes Node.js 22 and the iFlow CLI.
 
+<!-- toc -->
+<!-- tocstop -->
+
 ## Architecture
 
 1. **Main Components**:
@@ -108,8 +111,12 @@ INPUT_PROMPT="Analyze this code" INPUT_API_KEY=<key> ./iflow-action --use-env-va
    docker build -t iflow-cli-action .
    
    # Run with environment variables
-   docker run -e INPUT_PROMPT="Test prompt" -e INPUT_API_KEY=test-key iflow-cli-action
+   docker run -e INPUT_PROMPT="Test prompt" -e INPUT_API_KEY=test-key iflow-action
    
    # Run with precmd
-   docker run -e INPUT_PROMPT="Test prompt" -e INPUT_API_KEY=test-key -e INPUT_PRECMD="echo 'Running pre-command'" iflow-cli-action
+   docker run -e INPUT_PROMPT="Test prompt" -e INPUT_API_KEY=test-key -e INPUT_PRECMD="echo 'Running pre-command'" iflow-action
    ```
+
+## Table of Contents Generation
+
+This repository supports automatic table of contents generation for Markdown files. The TOC is automatically updated when Markdown files are modified. To enable TOC generation for a Markdown file, simply add `<!-- toc -->` where you want the TOC to appear. The generated TOC will be placed between `<!-- toc -->` and `<!-- tocstop -->` markers.

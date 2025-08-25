@@ -2,6 +2,9 @@
 
 通过 iFLOW CLI Action，可以让 [iFLOW CLI](https://platform.iflow.cn/cli/quickstart) 化身为您的 GitHub 开源项目开发伙伴. 您可以自定义任意灵活多变的工作流，智能化 & 自动化处理 issues、PRs、README 文档等.
 
+<!-- toc -->
+<!-- tocstop -->
+
 您也可以通过对话式的方式触发 iFLOW CLI 的执行, 比如在 bug issue 中评论 `@iflow-cli fix this issue` 即可触发智能化工作流帮您修复 BUG.
 
 ## 特性
@@ -203,6 +206,10 @@ iFLOW CLI Action 提供了执行摘要报告可以方便您去定义一些因为
 ### 超时
 
 iFLOW CLI Action 默认会控制自动化任务的执行时间在 3600 秒 (一小时内), 如果您的任务执行时间超过此时间, 可以调整 `with.timeout` 参数.
+
+## 目录生成
+
+此仓库支持 Markdown 文件的自动目录生成。当 Markdown 文件被修改时，目录会自动更新。要为 Markdown 文件启用目录生成，只需在希望目录出现的位置添加 `<!-- toc -->`。生成的目录将放置在 `<!-- toc -->` 和 `<!-- tocstop -->` 标记之间。
 
 ## 社区使用案例
 

@@ -6,6 +6,9 @@ A GitHub Action that enables you to run [iFlow CLI](https://github.com/iflow-ai/
 
 > Docs Site (generated with iFlow CLI GitHub Action): [https://iflow-ai.github.io/iflow-cli-action/](https://iflow-ai.github.io/iflow-cli-action/)
 
+<!-- toc -->
+<!-- tocstop -->
+
 ## Features
 
 - ✅ Docker-based action with pre-installed Node.js 22, npm, and uv
@@ -366,6 +369,10 @@ env:
 ## Contributing
 
 Contributions are welcome! Please feel free to submit issues and pull requests.
+
+## Table of Contents Generation
+
+This repository supports automatic table of contents generation for Markdown files. The TOC is automatically updated when Markdown files are modified. To enable TOC generation for a Markdown file, simply add `<!-- toc -->` where you want the TOC to appear. The generated TOC will be placed between `<!-- toc -->` and `<!-- tocstop -->` markers.
 
 ## License
 

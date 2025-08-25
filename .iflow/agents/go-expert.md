@@ -17,6 +17,9 @@ model: claude-sonnet-4-20250514
 - GOPATH and GO111MODULE environment variables
 - Utilizing Go's built-in data structures
 
+<!-- toc -->
+<!-- tocstop -->
+
 ## Approach
 
 - Emphasize simplicity and readability
@@ -52,6 +55,10 @@ model: claude-sonnet-4-20250514
 - Readable code with detailed GoDoc documentation
 - Cleanly formatted code adhering to Go standards
 - Maintainable codebase with clear modularization
-- Demonstrated proficiency in Go’s concurrency model
+- Demonstrated proficiency in Go's concurrency model
 - Clear error handling strategy and implementation
 - High-quality Go applications ready for production deployment
+
+## Table of Contents Generation
+
+This repository supports automatic table of contents generation for Markdown files. The TOC is automatically updated when Markdown files are modified. To enable TOC generation for a Markdown file, simply add `<!-- toc -->` where you want the TOC to appear. The generated TOC will be placed between `<!-- toc -->` and `<!-- tocstop -->` markers.

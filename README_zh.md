@@ -6,6 +6,9 @@
 
 > 文档站点（使用 iFlow CLI GitHub Action 生成）：[https://iflow-ai.github.io/iflow-cli-action/](https://iflow-ai.github.io/iflow-cli-action/)
 
+<!-- toc -->
+<!-- tocstop -->
+
 ## 功能特性
 
 - ✅ 基于 Docker 的操作，预装 Node.js 22、npm 和 uv
@@ -370,6 +373,10 @@ env:
 ## 贡献
 
 欢迎贡献！请随时提交问题和拉取请求。
+
+## 目录生成
+
+此仓库支持 Markdown 文件的自动目录生成。当 Markdown 文件被修改时，目录会自动更新。要为 Markdown 文件启用目录生成，只需在希望目录出现的位置添加 `<!-- toc -->`。生成的目录将放置在 `<!-- toc -->` 和 `<!-- tocstop -->` 标记之间。
 
 ## 许可证
 

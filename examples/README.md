@@ -4,6 +4,9 @@ This directory contains example GitHub Actions workflows demonstrating how to us
 
 **Note:** All iFlow CLI commands are automatically executed with `--prompt` and `--yolo` flags for non-interactive, streamlined operation.
 
+<!-- toc -->
+<!-- tocstop -->
+
 ## Basic Examples
 
 ### Code Review on Pull Request
@@ -1211,3 +1214,7 @@ sequenceDiagram
    - Commit and push the workflow file
    - Trigger the workflow based on its trigger conditions
    - Check the Actions tab for execution results
+
+## Table of Contents Generation
+
+This repository supports automatic table of contents generation for Markdown files. The TOC is automatically updated when Markdown files are modified. To enable TOC generation for a Markdown file, simply add `<!-- toc -->` where you want the TOC to appear. The generated TOC will be placed between `<!-- toc -->` and `<!-- tocstop -->` markers.

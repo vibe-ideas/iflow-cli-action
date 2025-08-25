@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+<!-- toc -->
+<!-- tocstop -->
+
 ## [Unreleased]
 
 ### Added
@@ -96,3 +99,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Flexible command execution with timeout control
 - GitHub Actions Summary integration for rich execution reports
 - Action outputs for result and exit code
+
+## Table of Contents Generation
+
+This repository supports automatic table of contents generation for Markdown files. The TOC is automatically updated when Markdown files are modified. To enable TOC generation for a Markdown file, simply add `<!-- toc -->` where you want the TOC to appear. The generated TOC will be placed between `<!-- toc -->` and `<!-- tocstop -->` markers.
