@@ -733,59 +733,31 @@ func handleToolVersions() error {
 }
 
 func installGH(version string) error {
-	info(fmt.Sprintf("Installing gh version %s...", version))
+	info(fmt.Sprintf("Installing gh version %s using go install...", version))
 
-	// 1. Construct download URL
-	url := fmt.Sprintf("https://github.com/cli/cli/releases/download/v%s/gh_%s_linux_amd64.tar.gz", version, version)
-
-	// 2. Create temp directory
-	tmpDir, err := os.MkdirTemp("", "gh-download")
-	if err != nil {
-		return fmt.Errorf("failed to create temp directory: %w", err)
-	}
-	defer os.RemoveAll(tmpDir)
-
-	// 3. Download gh release
-	info(fmt.Sprintf("Downloading gh from %s", url))
-	if err := executeCommand("wget", "-q", "-O", filepath.Join(tmpDir, "gh.tar.gz"), url); err != nil {
-		return fmt.Errorf("failed to download gh: %w", err)
+	// Add 'v' prefix if it's missing
+	if !strings.HasPrefix(version, "v") {
+		version = "v" + version
 	}
 
-	// 4. Extract tarball
-	info("Extracting gh...")
-	if err := executeCommand("tar", "-xzf", filepath.Join(tmpDir, "gh.tar.gz"), "-C", tmpDir); err != nil {
-		return fmt.Errorf("failed to extract gh: %w", err)
+	// 1. Install using go install
+	if err := executeCommand("go", "install", fmt.Sprintf("github.com/cli/cli/v2/cmd/gh@%s", version)); err != nil {
+		return fmt.Errorf("failed to install gh: %w", err)
 	}
 
-	// 5. Find gh binary
-	ghBinaryPath := filepath.Join(tmpDir, fmt.Sprintf("gh_%s_linux_amd64", version), "bin", "gh")
-	if _, err := os.Stat(ghBinaryPath); os.IsNotExist(err) {
-		return fmt.Errorf("gh binary not found at %s", ghBinaryPath)
-	}
-
-	// 6. Create bin directory in home
+	// 2. The binary will be in ~/go/bin, which should be in the PATH.
+	//    We add it to GITHUB_PATH to be safe.
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		return fmt.Errorf("failed to get home directory: %w", err)
 	}
-	localBin := filepath.Join(homeDir, "bin")
-	if err := os.MkdirAll(localBin, 0755); err != nil {
-		return fmt.Errorf("failed to create local bin directory: %w", err)
-	}
-
-	// 7. Move gh binary
-	newGhPath := filepath.Join(localBin, "gh")
-	if err := os.Rename(ghBinaryPath, newGhPath); err != nil {
-		return fmt.Errorf("failed to move gh binary: %w", err)
-	}
-
-	// 8. Add ~/bin to GITHUB_PATH
-	info(fmt.Sprintf("Adding %s to GITHUB_PATH", localBin))
-	if err := addPathToGitHubPath(localBin); err != nil {
+	goBinPath := filepath.Join(homeDir, "go", "bin")
+	info(fmt.Sprintf("Adding %s to GITHUB_PATH", goBinPath))
+	if err := addPathToGitHubPath(goBinPath); err != nil {
 		return fmt.Errorf("failed to add path to GITHUB_PATH: %w", err)
 	}
 
-	// 9. Verify installation
+	// 3. Verify installation
 	info("Verifying gh installation...")
 	if err := executeCommand("gh", "--version"); err != nil {
 		return fmt.Errorf("failed to verify gh installation: %w", err)
@@ -834,9 +806,6 @@ func executeCommand(name string, args ...string) error {
 func addPathToGitHubPath(path string) error {
 	githubPath := os.Getenv("GITHUB_PATH")
 	if githubPath == "" {
-		// If GITHUB_PATH is not set, we are likely not in a GitHub Actions environment.
-		// As a fallback, we can try to modify the current process's PATH.
-		// This might not affect subsequent steps in a CI/CD pipeline, but it's better than nothing.
 		info("GITHUB_PATH not set, falling back to setting PATH for current process")
 		currentPath := os.Getenv("PATH")
 		return os.Setenv("PATH", path+":"+currentPath)
