@@ -39,6 +39,14 @@ inputs:
     description: 'Shell command(s) to execute before running iFlow CLI (e.g., "npm install", "git fetch")'
     required: false
     default: ''
+  gh_version:
+    description: 'Version of GitHub CLI (gh) to install (e.g., "2.39.1"). If not specified, the default version in the Docker image is used.'
+    required: false
+    default: ''
+  iflow_cli_version:
+    description: 'Version of iFlow CLI to install (e.g., "0.1.0"). If not specified, the default version in the Docker image is used.'
+    required: false
+    default: ''
 
 outputs:
   result:

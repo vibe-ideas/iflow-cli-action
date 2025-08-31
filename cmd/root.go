@@ -18,17 +18,19 @@ import (
 
 // Config holds all configuration options
 type Config struct {
-	Prompt       string
-	APIKey       string
-	SettingsJSON string
-	BaseURL      string
-	Model        string
-	WorkingDir   string
-	Timeout      int
-	ExtraArgs    string // Additional command line arguments for iFlow CLI
-	PreCmd       string // Shell command(s) to execute before running iFlow CLI
-	UseEnvVars   bool   // Flag to indicate whether to use environment variables (GitHub Actions mode)
-	IsTimeout    bool   // Flag to indicate if execution timed out
+	Prompt          string
+	APIKey          string
+	SettingsJSON    string
+	BaseURL         string
+	Model           string
+	WorkingDir      string
+	Timeout         int
+	ExtraArgs       string // Additional command line arguments for iFlow CLI
+	PreCmd          string // Shell command(s) to execute before running iFlow CLI
+	GHVersion       string // GitHub CLI version
+	IFlowCLIVersion string // iFlow CLI version
+	UseEnvVars      bool   // Flag to indicate whether to use environment variables (GitHub Actions mode)
+	IsTimeout       bool   // Flag to indicate if execution timed out
 }
 
 // IFlowSettings represents the iFlow configuration
@@ -81,6 +83,8 @@ func init() {
 	rootCmd.Flags().IntVar(&config.Timeout, "timeout", 3600, "Timeout in seconds (1-86400)")
 	rootCmd.Flags().StringVar(&config.ExtraArgs, "extra-args", "", "Additional command line arguments to pass to iFlow CLI")
 	rootCmd.Flags().StringVar(&config.PreCmd, "precmd", "", "Shell command(s) to execute before running iFlow CLI")
+	rootCmd.Flags().StringVar(&config.GHVersion, "gh-version", "", "Version of GitHub CLI (gh) to install")
+	rootCmd.Flags().StringVar(&config.IFlowCLIVersion, "iflow-cli-version", "", "Version of iFlow CLI to install")
 	rootCmd.Flags().BoolVar(&config.UseEnvVars, "use-env-vars", false, "Use environment variables for configuration (GitHub Actions mode)")
 
 	// Mark required flags only if not in GitHub Actions mode - this will be validated later
@@ -100,6 +104,11 @@ func runIFlowAction() error {
 	// Validate configuration
 	if err := validateConfig(); err != nil {
 		return err
+	}
+
+	// Handle custom tool versions
+	if err := handleToolVersions(); err != nil {
+		return fmt.Errorf("failed to handle tool versions: %w", err)
 	}
 
 	// Setup working directory
@@ -208,6 +217,16 @@ func LoadConfigFromEnv() error {
 	if preCmd := getInput("precmd"); preCmd != "" {
 		config.PreCmd = strings.TrimSpace(preCmd)
 		info(fmt.Sprintf("Pre-command set to: '%s'", config.PreCmd))
+	}
+
+	if ghVersion := getInput("gh_version"); ghVersion != "" {
+		config.GHVersion = strings.TrimSpace(ghVersion)
+		info(fmt.Sprintf("GH version set to: '%s'", config.GHVersion))
+	}
+
+	if iflowCliVersion := getInput("iflow_cli_version"); iflowCliVersion != "" {
+		config.IFlowCLIVersion = strings.TrimSpace(iflowCliVersion)
+		info(fmt.Sprintf("iFlow CLI version set to: '%s'", config.IFlowCLIVersion))
 	}
 
 	return nil
@@ -697,4 +716,139 @@ func containsCode(text string) bool {
 		}
 	}
 	return false
+}
+
+func handleToolVersions() error {
+	if config.GHVersion != "" {
+		if err := installGH(config.GHVersion); err != nil {
+			return fmt.Errorf("failed to install gh version %s: %w", config.GHVersion, err)
+		}
+	}
+	if config.IFlowCLIVersion != "" {
+		if err := installIFlowCLI(config.IFlowCLIVersion); err != nil {
+			return fmt.Errorf("failed to install iflow-cli version %s: %w", config.IFlowCLIVersion, err)
+		}
+	}
+	return nil
+}
+
+func installGH(version string) error {
+	info(fmt.Sprintf("Installing gh version %s...", version))
+
+	// 1. Construct download URL
+	url := fmt.Sprintf("https://github.com/cli/cli/releases/download/v%s/gh_%s_linux_amd64.tar.gz", version, version)
+
+	// 2. Create temp directory
+	tmpDir, err := os.MkdirTemp("", "gh-download")
+	if err != nil {
+		return fmt.Errorf("failed to create temp directory: %w", err)
+	}
+	defer os.RemoveAll(tmpDir)
+
+	// 3. Download gh release
+	info(fmt.Sprintf("Downloading gh from %s", url))
+	if err := executeCommand("wget", "-q", "-O", filepath.Join(tmpDir, "gh.tar.gz"), url); err != nil {
+		return fmt.Errorf("failed to download gh: %w", err)
+	}
+
+	// 4. Extract tarball
+	info("Extracting gh...")
+	if err := executeCommand("tar", "-xzf", filepath.Join(tmpDir, "gh.tar.gz"), "-C", tmpDir); err != nil {
+		return fmt.Errorf("failed to extract gh: %w", err)
+	}
+
+	// 5. Find gh binary
+	ghBinaryPath := filepath.Join(tmpDir, fmt.Sprintf("gh_%s_linux_amd64", version), "bin", "gh")
+	if _, err := os.Stat(ghBinaryPath); os.IsNotExist(err) {
+		return fmt.Errorf("gh binary not found at %s", ghBinaryPath)
+	}
+
+	// 6. Create bin directory in home
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return fmt.Errorf("failed to get home directory: %w", err)
+	}
+	localBin := filepath.Join(homeDir, "bin")
+	if err := os.MkdirAll(localBin, 0755); err != nil {
+		return fmt.Errorf("failed to create local bin directory: %w", err)
+	}
+
+	// 7. Move gh binary
+	newGhPath := filepath.Join(localBin, "gh")
+	if err := os.Rename(ghBinaryPath, newGhPath); err != nil {
+		return fmt.Errorf("failed to move gh binary: %w", err)
+	}
+
+	// 8. Add ~/bin to GITHUB_PATH
+	info(fmt.Sprintf("Adding %s to GITHUB_PATH", localBin))
+	if err := addPathToGitHubPath(localBin); err != nil {
+		return fmt.Errorf("failed to add path to GITHUB_PATH: %w", err)
+	}
+
+	// 9. Verify installation
+	info("Verifying gh installation...")
+	if err := executeCommand("gh", "--version"); err != nil {
+		return fmt.Errorf("failed to verify gh installation: %w", err)
+	}
+
+	info(fmt.Sprintf("Successfully installed gh version %s", version))
+	return nil
+}
+
+func installIFlowCLI(version string) error {
+	info(fmt.Sprintf("Installing iflow-cli version %s...", version))
+
+	// 1. Install using npm
+	if err := executeCommand("npm", "install", fmt.Sprintf("@iflow-ai/iflow-cli@%s", version)); err != nil {
+		return fmt.Errorf("failed to install iflow-cli: %w", err)
+	}
+
+	// 2. Add node_modules/.bin to GITHUB_PATH
+	wd, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("failed to get working directory: %w", err)
+	}
+	nodeBinPath := filepath.Join(wd, "node_modules", ".bin")
+	info(fmt.Sprintf("Adding %s to GITHUB_PATH", nodeBinPath))
+	if err := addPathToGitHubPath(nodeBinPath); err != nil {
+		return fmt.Errorf("failed to add path to GITHUB_PATH: %w", err)
+	}
+
+	// 3. Verify installation
+	info("Verifying iflow-cli installation...")
+	if err := executeCommand("iflow", "--version"); err != nil {
+		return fmt.Errorf("failed to verify iflow-cli installation: %w", err)
+	}
+
+	info(fmt.Sprintf("Successfully installed iflow-cli version %s", version))
+	return nil
+}
+
+func executeCommand(name string, args ...string) error {
+	cmd := exec.Command(name, args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
+
+func addPathToGitHubPath(path string) error {
+	githubPath := os.Getenv("GITHUB_PATH")
+	if githubPath == "" {
+		// If GITHUB_PATH is not set, we are likely not in a GitHub Actions environment.
+		// As a fallback, we can try to modify the current process's PATH.
+		// This might not affect subsequent steps in a CI/CD pipeline, but it's better than nothing.
+		info("GITHUB_PATH not set, falling back to setting PATH for current process")
+		currentPath := os.Getenv("PATH")
+		return os.Setenv("PATH", path+":"+currentPath)
+	}
+	f, err := os.OpenFile(githubPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return fmt.Errorf("failed to open GITHUB_PATH file: %w", err)
+	}
+	defer f.Close()
+	if _, err := f.WriteString(path + "\n"); err != nil {
+		return fmt.Errorf("failed to write to GITHUB_PATH file: %w", err)
+	}
+	info(fmt.Sprintf("Successfully added %s to GITHUB_PATH", path))
+	return nil
 }
